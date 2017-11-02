@@ -39,4 +39,9 @@ def set_global_vec3(k):
 	else:
 		return to_vec3(k)
 
+def cond_offset(p):
+	if type(p) is str or np.count_nonzero(p) > 0:
+		return ' - vec4(' + vec3_str(p) + ', 0)'
+	return ''
+
 _PYSPACE_GLOBAL_VARS = {}

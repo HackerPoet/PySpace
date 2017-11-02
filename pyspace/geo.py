@@ -18,10 +18,7 @@ class Sphere:
 		return normalize(p[:3] - c) * r + c
 	
 	def glsl(self):
-		center = ''
-		if np.count_nonzero(self.c) > 0:
-			center = ' - vec4(' + vec3_str(self.c) + ', 0)'
-		return 'de_sphere(p' + center + ', ' + str(self.r) + ');\n'
+		return 'de_sphere(p' + cond_offset(self.c) + ', ' + str(self.r) + ');\n'
 
 class Box:
 	def __init__(self, r=1.0, c=(0,0,0)):
@@ -40,10 +37,7 @@ class Box:
 		return np.clip(p[:3] - c, -r, r) + c
 	
 	def glsl(self):
-		center = ''
-		if np.count_nonzero(self.c) > 0:
-			center = ' - vec4(' + vec3_str(self.c) + ', 0)'
-		return 'de_box(p' + center + ', ' + str(self.r) + ');\n'
+		return 'de_box(p' + cond_offset(self.c) + ', ' + str(self.r) + ');\n'
 
 class InfCross:
 	def __init__(self, r=1.0, c=(0,0,0)):
@@ -67,10 +61,7 @@ class InfCross:
 		return n + c
 	
 	def glsl(self):
-		center = ''
-		if np.count_nonzero(self.c) > 0:
-			center = ' - vec4(' + vec3_str(self.c) + ', 0)'
-		return 'de_inf_cross(p' + center + ', ' + str(self.r) + ');\n'
+		return 'de_inf_cross(p' + cond_offset(self.c) + ', ' + str(self.r) + ');\n'
 
 class InfCrossXY:
 	def __init__(self, r=1.0, c=(0,0,0)):
@@ -94,10 +85,7 @@ class InfCrossXY:
 		return n + c
 	
 	def glsl(self):
-		center = ''
-		if np.count_nonzero(self.c) > 0:
-			center = ' - vec4(' + vec3_str(self.c) + ', 0)'
-		return 'de_inf_cross_xy(p' + center + ', ' + str(self.r) + ');\n'
+		return 'de_inf_cross_xy(p' + cond_offset(self.c) + ', ' + str(self.r) + ');\n'
 		
 class InfLine:
 	def __init__(self, r=1.0, n=(1,0,0), c=(0,0,0)):
@@ -123,7 +111,4 @@ class InfLine:
 		return n + c
 	
 	def glsl(self):
-		center = ''
-		if np.count_nonzero(self.c) > 0:
-			center = ' - vec4(' + vec3_str(self.c) + ', 0)'
-		return 'de_inf_line(p' + center + ', ' + str(self.n) + ', ' + str(self.r) + ');\n'
+		return 'de_inf_line(p' + cond_offset(self.c) + ', ' + str(self.n) + ', ' + str(self.r) + ');\n'
