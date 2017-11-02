@@ -18,10 +18,10 @@ uniform float iSlider;
 
 #define DE de_main
 #define COL col_main
-#define DOF 1.0
-#define FOCAL_LENGTH 0.1
+#define DOF 0.0
+#define FOCAL_LENGTH 0.5
 #define SHADOW_MULT 0.5
-#define AA_LEVEL 4
+#define AA_LEVEL 2
 #define USE_SHADDOW true
 #define AO_LEVEL 0.01
 #define REFLECTION_LEVEL 0
@@ -41,8 +41,8 @@ float rand(float s, float minV, float maxV) {
 	return (r + 1.0) * 0.5 * (maxV - minV) + minV;
 }
 float smin(float a, float b, float k) {
-    float h = clamp(0.5 + 0.5*(b-a)/k, 0.0, 1.0 );
-    return mix(b, a, h) - k*h*(1.0 - h);
+	float h = clamp(0.5 + 0.5*(b-a)/k, 0.0, 1.0 );
+	return mix(b, a, h) - k*h*(1.0 - h);
 	//return -log(exp(-a/k) + exp(-b/k))*k;
 }
 
@@ -101,7 +101,7 @@ float de_box(vec4 p, float r) {
 	return (min(max(max(a.x, a.y), a.z), 0.0) + length(max(a, 0.0))) / p.w;
 }
 float de_tetrahedron(vec4 p, float r) {
-	float md = max(max(-p.x - p.y - p.z, p.x + p.y - p.z), 
+	float md = max(max(-p.x - p.y - p.z, p.x + p.y - p.z),
 				   max(-p.x + p.y + p.z, p.x - p.y + p.z));
 	return (md - r) / (p.w * sqrt(3.0));
 }
@@ -124,22 +124,22 @@ float de_inf_line(vec4 p, vec3 n, float r) {
 //##########################################
 float de_sierpinski_tetrahedron(vec4 z) {
 	vec4 ones = vec4(1.0, 1.0, 1.0, 0.0);
-    for(int i = 0; i < 8; i++) {
-       sierpinskiFold(z);
-       z = z * 2.0 - ones;
-    }
-    return de_tetrahedron(z, 1.0); 
+	for(int i = 0; i < 8; i++) {
+		sierpinskiFold(z);
+		z = z * 2.0 - ones;
+	}
+	return de_tetrahedron(z, 1.0);
 }
 float de_menger(vec4 z) {
-    for(int i = 0; i < 12; i++) {
-    	absFold(z);
+	for(int i = 0; i < 12; i++) {
+		absFold(z);
 		sort(z);
-   		z   *= 3.0;
+		z   *= 3.0;
 		z.x -= 2.0;
 		z.y -= 2.0;
 		z.z  = 1.0 - abs(z.z - 1.0);
-    }
-    return de_box(z, 1.0); 
+	}
+	return de_box(z, 1.0);
 }
 float de_mandelbox(vec4 z) {
 	vec4 offset = z;
@@ -148,7 +148,7 @@ float de_mandelbox(vec4 z) {
 	for (int n = 0; n < NUM_ITERS; n++) {
 		boxFold(z, 1.0);
 		sphereFold(z, 0.5, 1.0);
-        z = scale*z + offset;
+		z = scale*z + offset;
 	}
 	return de_box(z, 0.0);
 }
@@ -173,15 +173,6 @@ float de_test(vec4 p) {
 
 //##########################################
 //
-//   Compiled
-//
-//##########################################
-
-// [pyspace]
-// [/pyspace]
-
-//##########################################
-//
 //   Coloring
 //
 //##########################################
@@ -193,14 +184,23 @@ vec3 col_mandelbox(vec4 offset) {
 	for (int n = 0; n < NUM_ITERS; n++) {
 		boxFold(z, 1.0);
 		sphereFold(z, 0.5, 1.0);
-        z = scale*z + offset;
+		z = scale*z + offset;
 		minZ = min(minZ, abs(z.xyz) / (n + 1));
 	}
 	return minZ * 2.0;
 }
-vec3 col_none(vec4 z) {
-	return abs(z.xyz);
+vec4 col_none(vec4 z) {
+	return vec4(abs(z.xyz), 0.0);
 }
+
+//##########################################
+//
+//   Compiled
+//
+//##########################################
+
+// [pyspace]
+// [/pyspace]
 
 //##########################################
 //
@@ -252,7 +252,7 @@ vec3 scene(inout vec4 origin, inout vec4 ray, float distToCenter) {
 		//Get diffuse lighting
 		float light = (1.0 - dot(n, LIGHT_DIR.xyz)) * 0.5;
 		light = 1.0 - DIFFUSE_SHADE * light;
-		
+
 		//Get coloring
 		vec3 closest = COL(p).xyz;
 		col = light / (closest + 1.0);
@@ -269,22 +269,22 @@ vec3 scene(inout vec4 origin, inout vec4 ray, float distToCenter) {
 		} else {
 			//Get distance to shadow
 			//float k = min(d_s_td2_m.w, 1.0);
-			
+
 			//Get specular
 			float specular = max(dot(reflected, LIGHT_DIR.xyz), 0.0);
 			specular = pow(specular, 40);
-			
+
 			//Blend shadow and specular
 			col = k*min(col + specular*LIGHT_COL, 1.0) + (1.0 - k)*SHADOW_MULT*col;
 		}
-		
+
 		//Add small amount of ambient occlusion
 		float a = 1.0 / (1.0 + s * AO_LEVEL);
 		col = a*col + (1.0 - a)*BG_LVL;
-		
+
 		//Add any ambient light at the end
 		col += AMBIENT_LIGHT;
-		
+
 		//Set up the reflection
 		origin = p + vec4(n * MIN_DIST * 100, 0.0);
 		ray = vec4(reflected, 0.0);
@@ -306,14 +306,14 @@ void main() {
 				mat4 mat = iMat;
 				float a = float(k) / MOTION_BLUR_LEVEL;
 				mat[3] = iPrevMat[3]*a + iMat[3]*(1.0 - a);
-				
+
 				vec2 delta = vec2(i, j) / AA_LEVEL;
 				vec4 dxy = vec4(delta.x, delta.y, 0.0, 0.0) * DOF / iResolution.x;
-			
+
 				vec2 screen_pos = (gl_FragCoord.xy + delta) / iResolution.xy;
 				vec2 uv = 2*screen_pos - 1;
 				uv.x *= iResolution.x / iResolution.y;
-				
+
 				//Convert screen coordinate to 3d ray
 				vec4 ray;
 				if (USE_ORTHOGONAL) {
@@ -348,7 +348,7 @@ void main() {
 					}
 					a *= REFLECTION_BLEND;
 				}
-				
+
 				col += newCol;
 			}
 		}

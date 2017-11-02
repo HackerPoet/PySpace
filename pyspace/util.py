@@ -30,7 +30,7 @@ def set_global_float(k):
 		k = '_' + k
 		_PYSPACE_GLOBAL_VARS[k] = 0.0
 	return k
-		
+
 def set_global_vec3(k):
 	if type(k) is str:
 		k = '_' + k

@@ -4,3 +4,5 @@
 *.png
 *.prproj
 *.pyc
+
+frag_gen.glsl

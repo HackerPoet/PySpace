@@ -16,9 +16,12 @@ class Sphere:
 		c = get_global(self.c)
 		r = get_global(self.r)
 		return normalize(p[:3] - c) * r + c
-	
+
 	def glsl(self):
-		return 'de_sphere(p' + cond_offset(self.c) + ', ' + str(self.r) + ');\n'
+		return 'de_sphere(p' + cond_offset(self.c) + ', ' + str(self.r) + ')'
+
+	def glsl_col(self):
+		return 'col_none(p)'
 
 class Box:
 	def __init__(self, r=1.0, c=(0,0,0)):
@@ -35,9 +38,12 @@ class Box:
 		c = get_global(self.c)
 		r = get_global(self.r)
 		return np.clip(p[:3] - c, -r, r) + c
-	
+
 	def glsl(self):
-		return 'de_box(p' + cond_offset(self.c) + ', ' + str(self.r) + ');\n'
+		return 'de_box(p' + cond_offset(self.c) + ', ' + str(self.r) + ')'
+
+	def glsl_col(self):
+		return 'col_none(p)'
 
 class InfCross:
 	def __init__(self, r=1.0, c=(0,0,0)):
@@ -59,9 +65,12 @@ class InfCross:
 		n = normalize(n) * r
 		n[m_ix] = p[m_ix] - c[m_ix]
 		return n + c
-	
+
 	def glsl(self):
-		return 'de_inf_cross(p' + cond_offset(self.c) + ', ' + str(self.r) + ');\n'
+		return 'de_inf_cross(p' + cond_offset(self.c) + ', ' + str(self.r) + ')'
+
+	def glsl_col(self):
+		return 'col_none(p)'
 
 class InfCrossXY:
 	def __init__(self, r=1.0, c=(0,0,0)):
@@ -83,10 +92,13 @@ class InfCrossXY:
 		n = normalize(n) * r
 		n[m_ix] = p[m_ix] - c[m_ix]
 		return n + c
-	
+
 	def glsl(self):
-		return 'de_inf_cross_xy(p' + cond_offset(self.c) + ', ' + str(self.r) + ');\n'
-		
+		return 'de_inf_cross_xy(p' + cond_offset(self.c) + ', ' + str(self.r) + ')'
+
+	def glsl_col(self):
+		return 'col_none(p)'
+
 class InfLine:
 	def __init__(self, r=1.0, n=(1,0,0), c=(0,0,0)):
 		self.r = set_global_float(r)
@@ -109,6 +121,9 @@ class InfLine:
 		n = normalize(n) * r
 		n[m_ix] = p[m_ix] - c[m_ix]
 		return n + c
-	
+
 	def glsl(self):
-		return 'de_inf_line(p' + cond_offset(self.c) + ', ' + str(self.n) + ', ' + str(self.r) + ');\n'
+		return 'de_inf_line(p' + cond_offset(self.c) + ', ' + str(self.n) + ', ' + str(self.r) + ')'
+
+	def glsl_col(self):
+		return 'col_none(p)'
