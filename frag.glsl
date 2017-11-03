@@ -95,8 +95,8 @@ void rotZ(inout vec4 z, float a) {
 float de_sphere(vec4 p, float r) {
 	return (length(p.xyz) - r) / p.w;
 }
-float de_box(vec4 p, float r) {
-	vec3 a = abs(p.xyz) - r;
+float de_box(vec4 p, vec3 s) {
+	vec3 a = abs(p.xyz) - s;
 	return (min(max(max(a.x, a.y), a.z), 0.0) + length(max(a, 0.0))) / p.w;
 }
 float de_tetrahedron(vec4 p, float r) {
@@ -138,7 +138,7 @@ float de_menger(vec4 z) {
 		z.y -= 2.0;
 		z.z  = 1.0 - abs(z.z - 1.0);
 	}
-	return de_box(z, 1.0);
+	return de_box(z, vec3(1.0));
 }
 float de_mandelbox(vec4 z) {
 	vec4 offset = z;
@@ -149,24 +149,9 @@ float de_mandelbox(vec4 z) {
 		sphereFold(z, 0.5, 1.0);
 		z = scale*z + offset;
 	}
-	return de_box(z, 0.0);
+	return de_box(z, vec3(0.0));
 }
 float de_test(vec4 p) {
-	/*
-	vec4 o = p;
-	float d = 9999.0;
-	d = min(d, de_box(p, 0.5));
-
-	for (int i = 0; i < 16; ++i) {
-		planeFold(p, vec3(1.0,0.0,0.0), 0.0);
-		p *= 1.5;
-		p.xyz += vec3(-1.0,-1.0,0.0);
-		rotY(p, 1.0);
-		rotZ(p, 0.2);
-		d = smin(d, de_box(p, 0.5), iSlider / p.w);
-	}
-	*/
-	//p.xyz = abs(mod(p.xyz - _r*0.5, _r) - _r*0.5);
 	return de_inf_cross(p,0.1);
 }
 

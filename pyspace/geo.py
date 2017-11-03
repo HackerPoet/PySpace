@@ -24,23 +24,25 @@ class Sphere:
 		return 'col_none(p)'
 
 class Box:
-	def __init__(self, r=1.0, c=(0,0,0)):
-		self.r = set_global_float(r)
+	def __init__(self, s=(1,1,1), c=(0,0,0)):
+		if type(s) is float:
+			s = (s,s,s)
+		self.s = set_global_vec3(s)
 		self.c = set_global_vec3(c)
 
 	def DE(self, p):
 		c = get_global(self.c)
-		r = get_global(self.r)
-		a = np.abs(p[:3] - c) - r;
+		s = get_global(self.s)
+		a = np.abs(p[:3] - c) - s;
 		return (min(max(a[0], a[1], a[2]), 0.0) + np.linalg.norm(np.maximum(a,0.0))) / p[3]
 
 	def NP(self, p):
 		c = get_global(self.c)
-		r = get_global(self.r)
-		return np.clip(p[:3] - c, -r, r) + c
+		s = get_global(self.s)
+		return np.clip(p[:3] - c, -s, s) + c
 
 	def glsl(self):
-		return 'de_box(p' + cond_offset(self.c) + ', ' + str(self.r) + ')'
+		return 'de_box(p' + cond_offset(self.c) + ', ' + vec3_str(self.s) + ')'
 
 	def glsl_col(self):
 		return 'col_none(p)'
