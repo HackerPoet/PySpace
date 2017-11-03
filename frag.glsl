@@ -238,7 +238,7 @@ vec3 scene(inout vec4 origin, inout vec4 ray, float distToCenter) {
 		light = 1.0 - DIFFUSE_SHADE * light;
 
 		//Get coloring
-		col = light * COL(p).xyz;
+		col = clamp(light * COL(p).xyz, 0.0, 1.0);
 
 		//Get if this point is in shadow
 		float k = 1.0;

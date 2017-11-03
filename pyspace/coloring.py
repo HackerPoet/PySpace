@@ -22,9 +22,16 @@ class OrbitMin:
 	def orbit(self):
 		return '\torbit = min(orbit, abs(p.xyz)*' + vec3_str(self.scale) + ');\n'
 
-class OrbitSum:
-	def __init__(self):
-		pass
+class OrbitMax:
+	def __init__(self, scale=(1,1,1)):
+		self.scale = set_global_vec3(scale)
 
 	def orbit(self):
-		return '\torbit = min(orbit, abs(p.xyz));\n'
+		return '\torbit = max(orbit, abs(p.xyz)*' + vec3_str(self.scale) + ');\n'
+
+class OrbitSum:
+	def __init__(self, scale=(1,1,1)):
+		self.scale = set_global_vec3(scale)
+
+	def orbit(self):
+		return '\torbit += p.xyz*' + vec3_str(self.scale) + ';\n'
