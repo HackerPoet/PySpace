@@ -27,23 +27,26 @@ class Object:
 		undo = []
 		p = np.copy(origin)
 		d = 1e20
-		n = None
+		n = np.zeros((3,), dtype=np.float32)
 		for t in self.trans:
+			undo.append((t, np.copy(p)))
 			if hasattr(t, 'fold'):
 				#if hasattr(fold, 'o'):
 				#	fold.o = origin
-				undo.append((t, np.copy(p)))
 				t.fold(p)
 			elif hasattr(t, 'NP'):
+				pass
+			else:
+				raise Exception("Invalid type in transformation queue")
+		for t, p in undo[::-1]:
+			if hasattr(t, 'fold'):
+				t.unfold(p, n)
+			elif hasattr(t, 'NP'):
 				cur_n = t.NP(p)
-				cur_d = norm_sq(cur_n - p[:3])
+				cur_d = norm_sq(cur_n - p[:3]) / (p[3] * p[3])
 				if cur_d < d:
 					d = cur_d
 					n = cur_n
-			else:
-				raise Exception("Invalid type in transformation queue")
-		for fold, p in undo[::-1]:
-			fold.unfold(p, n)
 		return n
 
 	def glsl(self):
