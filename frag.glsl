@@ -289,7 +289,8 @@ void main() {
 				mat[3] = iPrevMat[3]*a + iMat[3]*(1.0 - a);
 
 				vec2 delta = vec2(i, j) / AA_LEVEL;
-				vec4 dxy = vec4(delta.x, delta.y, 0.0, 0.0) * DOF / iResolution.x;
+				vec2 delta2 = vec2(rand(i,0,1), rand(j+0.1,0,1));
+				vec4 dxy = vec4(delta2.x, delta2.y, 0.0, 0.0) * DOF / iResolution.x;
 
 				vec2 screen_pos = (gl_FragCoord.xy + delta) / iResolution.xy;
 				vec2 uv = 2*screen_pos - 1;
