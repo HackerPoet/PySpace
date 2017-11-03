@@ -19,6 +19,7 @@ class Object:
 				t.fold(p)
 			elif hasattr(t, 'DE'):
 				d = min(d, t.DE(p))
+			elif hasattr(t, 'orbit'): pass
 			else:
 				raise Exception("Invalid type in transformation queue")
 		return d
@@ -34,8 +35,8 @@ class Object:
 				#if hasattr(fold, 'o'):
 				#	fold.o = origin
 				t.fold(p)
-			elif hasattr(t, 'NP'):
-				pass
+			elif hasattr(t, 'NP'): pass
+			elif hasattr(t, 'orbit'): pass
 			else:
 				raise Exception("Invalid type in transformation queue")
 		for t, p in undo[::-1]:
@@ -64,13 +65,13 @@ class Object:
 				s += t.glsl()
 			elif hasattr(t, 'DE'):
 				s += '\td = min(d, ' + t.glsl() + ');\n'
+			elif hasattr(t, 'orbit'): pass
 			else:
 				raise Exception("Invalid type in transformation queue")
 		s += '\treturn d;\n'
 		s += '}\n'
 		s += 'vec4 col_' + self.name + '(vec4 p) {\n'
 		#s += '\tvec4 o = p;\n'
-		#s += '\tvec4 orbit = vec4(1e20);\n'
 		s += '\tvec4 col = vec4(1e20);\n'
 		s += '\tvec4 newCol;\n'
 		for t in self.trans:
@@ -79,10 +80,8 @@ class Object:
 			elif hasattr(t, 'DE'):
 				s += '\tnewCol = ' + t.glsl_col() + ';\n'
 				s += '\tif (newCol.w < col.w) { col = newCol; }\n'
-			else:
-				raise Exception("Invalid type in transformation queue")
-			#if t.__class__.__name__ == 'FoldScaleTranslate':
-			#	s += '\torbit.xyz = min(orbit.xyz, abs(p.xyz));\n'
+			elif hasattr(t, 'orbit'):
+				s += t.orbit()
 		s += '\treturn col;\n'
 		s += '}\n'
 		return s

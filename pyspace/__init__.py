@@ -1,1 +1,7 @@
-__all__ = ["fold", "geo", "object"]
+__all__ = [
+	"coloring",
+	"fold",
+	"geo",
+	"object",
+	"shader"
+]

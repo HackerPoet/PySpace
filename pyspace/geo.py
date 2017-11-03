@@ -3,9 +3,10 @@ import numpy as np
 from util import *
 
 class Sphere:
-	def __init__(self, r=1.0, c=(0,0,0)):
+	def __init__(self, r=1.0, c=(0,0,0), color=(1,1,1)):
 		self.r = set_global_float(r)
 		self.c = set_global_vec3(c)
+		self.color = color
 
 	def DE(self, p):
 		c = get_global(self.c)
@@ -21,14 +22,15 @@ class Sphere:
 		return 'de_sphere(p' + cond_offset(self.c) + ', ' + str(self.r) + ')'
 
 	def glsl_col(self):
-		return 'col_none(p)'
+		return make_color(self)
 
 class Box:
-	def __init__(self, s=(1,1,1), c=(0,0,0)):
+	def __init__(self, s=(1,1,1), c=(0,0,0), color=(1,1,1)):
 		if type(s) is float:
 			s = (s,s,s)
 		self.s = set_global_vec3(s)
 		self.c = set_global_vec3(c)
+		self.color = color
 
 	def DE(self, p):
 		c = get_global(self.c)
@@ -45,12 +47,13 @@ class Box:
 		return 'de_box(p' + cond_offset(self.c) + ', ' + vec3_str(self.s) + ')'
 
 	def glsl_col(self):
-		return 'col_none(p)'
+		return make_color(self)
 
 class InfCross:
-	def __init__(self, r=1.0, c=(0,0,0)):
+	def __init__(self, r=1.0, c=(0,0,0), color=(1,1,1)):
 		self.r = set_global_float(r)
 		self.c = set_global_vec3(c)
+		self.color = color
 
 	def DE(self, p):
 		r = get_global(self.r)
@@ -72,12 +75,13 @@ class InfCross:
 		return 'de_inf_cross(p' + cond_offset(self.c) + ', ' + str(self.r) + ')'
 
 	def glsl_col(self):
-		return 'col_none(p)'
+		return make_color(self)
 
 class InfCrossXY:
-	def __init__(self, r=1.0, c=(0,0,0)):
+	def __init__(self, r=1.0, c=(0,0,0), color=(1,1,1)):
 		self.r = set_global_float(r)
 		self.c = set_global_vec3(c)
+		self.color = color
 
 	def DE(self, p):
 		r = get_global(self.r)
@@ -99,13 +103,14 @@ class InfCrossXY:
 		return 'de_inf_cross_xy(p' + cond_offset(self.c) + ', ' + str(self.r) + ')'
 
 	def glsl_col(self):
-		return 'col_none(p)'
+		return make_color(self)
 
 class InfLine:
-	def __init__(self, r=1.0, n=(1,0,0), c=(0,0,0)):
+	def __init__(self, r=1.0, n=(1,0,0), c=(0,0,0), color=(1,1,1)):
 		self.r = set_global_float(r)
 		self.n = set_global_vec3(n)
 		self.c = set_global_vec3(c)
+		self.color = color
 
 	def DE(self, p):
 		r = get_global(self.r)
@@ -128,4 +133,4 @@ class InfLine:
 		return 'de_inf_line(p' + cond_offset(self.c) + ', ' + str(self.n) + ', ' + str(self.r) + ')'
 
 	def glsl_col(self):
-		return 'col_none(p)'
+		return make_color(self)

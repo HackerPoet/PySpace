@@ -4,11 +4,15 @@ def normalize(x):
 	return x / np.linalg.norm(x)
 
 def to_vec3(v):
+	if type(v) is float:
+		return np.array([v, v, v], dtype=np.float32)
 	return np.array([v[0], v[1], v[2]], dtype=np.float32)
 
 def vec3_str(v):
 	if type(v) is str:
 		return v
+	elif type(v) is float:
+		return 'vec3(' + str(v) + ')'
 	else:
 		return 'vec3(' + str(v[0]) + ',' + str(v[1]) + ',' + str(v[2]) + ')'
 
@@ -43,5 +47,13 @@ def cond_offset(p):
 	if type(p) is str or np.count_nonzero(p) > 0:
 		return ' - vec4(' + vec3_str(p) + ', 0)'
 	return ''
+
+def make_color(geo):
+	if type(geo.color) is tuple or type(geo.color) is np.ndarray:
+		return 'vec4(' + vec3_str(geo.color) + ', ' + geo.glsl() + ')'
+	elif geo.color == 'orbit' or geo.color == 'o':
+		return 'vec4(orbit, ' + geo.glsl() + ')'
+	else:
+		raise Exception("Invalid coloring type")
 
 _PYSPACE_GLOBAL_VARS = {}
