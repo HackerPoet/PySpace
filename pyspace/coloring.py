@@ -35,3 +35,10 @@ class OrbitSum:
 
 	def orbit(self):
 		return '\torbit += p.xyz*' + vec3_str(self.scale) + ';\n'
+
+class OrbitSumAbs:
+	def __init__(self, scale=(1,1,1)):
+		self.scale = set_global_vec3(scale)
+
+	def orbit(self):
+		return '\torbit += abs(p.xyz)*' + vec3_str(self.scale) + ';\n'
