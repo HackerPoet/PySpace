@@ -27,7 +27,6 @@ uniform float iSlider;
 #define REFLECTION_LEVEL 0
 #define REFLECTION_BLEND 0.5
 #define MOTION_BLUR_LEVEL 1
-#define REFRACTION_LEVEL 0
 #define DIFFUSE_SHADE 1.0
 #define AMBIENT_LIGHT 0.0
 #define MY_SIZE 0.02
@@ -261,15 +260,13 @@ vec3 scene(inout vec4 origin, inout vec4 ray, float distToCenter) {
 		float k = 1.0;
 		if (USE_SHADDOW) {
 			vec4 light_pt = p;
-			light_pt.xyz += n * MIN_DIST * 5;
-			k = min(ray_march(light_pt, LIGHT_DIR).w, 1.0);
+			light_pt.xyz += n * MIN_DIST * 10;
+			vec4 rm = ray_march(light_pt, LIGHT_DIR);
+			k = rm.w * min(rm.z, 1.0);
 		}
 		if (k < 0.001) {
 			col *= SHADOW_MULT;
 		} else {
-			//Get distance to shadow
-			//float k = min(d_s_td2_m.w, 1.0);
-
 			//Get specular
 			float specular = max(dot(reflected, LIGHT_DIR.xyz), 0.0);
 			specular = pow(specular, 40);
