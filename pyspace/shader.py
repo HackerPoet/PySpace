@@ -1,6 +1,6 @@
 from ctypes import *
 from OpenGL.GL import *
-from util import _PYSPACE_GLOBAL_VARS
+from util import _PYSPACE_GLOBAL_VARS, to_vec3
 
 class Shader:
 	def __init__(self):
@@ -12,6 +12,10 @@ class Shader:
 
 	def set(self, key, val):
 		key = '_' + key
+		if key in _PYSPACE_GLOBAL_VARS:
+			cur_val = _PYSPACE_GLOBAL_VARS[key]
+			if type(val) == float and type(cur_val) != float:
+				val = to_vec3(val)
 		_PYSPACE_GLOBAL_VARS[key] = val
 		if key in self.keys:
 			key_id = self.keys[key]
