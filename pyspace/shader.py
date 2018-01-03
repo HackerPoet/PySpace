@@ -11,10 +11,9 @@ class Shader:
 		self.objs.append(obj)
 
 	def set(self, key, val):
-		key = '_' + key
 		if key in _PYSPACE_GLOBAL_VARS:
 			cur_val = _PYSPACE_GLOBAL_VARS[key]
-			if type(val) == float and type(cur_val) != float:
+			if type(val) is float and type(cur_val) is not float:
 				val = to_vec3(val)
 		_PYSPACE_GLOBAL_VARS[key] = val
 		if key in self.keys:
@@ -33,7 +32,7 @@ class Shader:
 		var_code = ''
 		for k in _PYSPACE_GLOBAL_VARS:
 			typ = 'float' if type(_PYSPACE_GLOBAL_VARS[k]) is float else 'vec3'
-			var_code += 'uniform ' + typ + ' ' + k + ';\n'
+			var_code += 'uniform ' + typ + ' _' + k + ';\n'
 
 		split_ix = f_shader.index('// [/pyvars]')
 		f_shader = f_shader[:split_ix] + var_code + f_shader[split_ix:]
@@ -54,7 +53,7 @@ class Shader:
 
 		#Get variable ids for each uniform
 		for k in _PYSPACE_GLOBAL_VARS:
-			self.keys[k] = glGetUniformLocation(program, k);
+			self.keys[k] = glGetUniformLocation(program, '_' + k);
 
 		#Return the program
 		return program

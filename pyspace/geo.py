@@ -19,7 +19,7 @@ class Sphere:
 		return normalize(p[:3] - c) * r + c
 
 	def glsl(self):
-		return 'de_sphere(p' + cond_offset(self.c) + ', ' + str(self.r) + ')'
+		return 'de_sphere(p' + cond_offset(self.c) + ', ' + float_str(self.r) + ')'
 
 	def glsl_col(self):
 		return make_color(self)
@@ -72,7 +72,7 @@ class InfCross:
 		return n + c
 
 	def glsl(self):
-		return 'de_inf_cross(p' + cond_offset(self.c) + ', ' + str(self.r) + ')'
+		return 'de_inf_cross(p' + cond_offset(self.c) + ', ' + float_str(self.r) + ')'
 
 	def glsl_col(self):
 		return make_color(self)
@@ -100,7 +100,7 @@ class InfCrossXY:
 		return n + c
 
 	def glsl(self):
-		return 'de_inf_cross_xy(p' + cond_offset(self.c) + ', ' + str(self.r) + ')'
+		return 'de_inf_cross_xy(p' + cond_offset(self.c) + ', ' + float_str(self.r) + ')'
 
 	def glsl_col(self):
 		return make_color(self)
@@ -130,7 +130,7 @@ class InfLine:
 		return n + c
 
 	def glsl(self):
-		return 'de_inf_line(p' + cond_offset(self.c) + ', ' + str(self.n) + ', ' + str(self.r) + ')'
+		return 'de_inf_line(p' + cond_offset(self.c) + ', ' + vec3_str(self.n) + ', ' + float_str(self.r) + ')'
 
 	def glsl_col(self):
 		return make_color(self)
