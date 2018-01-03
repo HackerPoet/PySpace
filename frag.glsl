@@ -9,21 +9,22 @@ uniform float iSlider;
 // [/pyvars]
 
 #define NUM_ITERS 24
-#define NUM_STEPS 800
-#define MIN_DIST 0.00001
+#define NUM_STEPS 1000
+#define MIN_DIST 0.0001
 #define MAX_DIST 100.0
 #define FOCAL_DIST 2.0
-#define BG_LVL vec3(0.6,0.6,0.9)
+#define BG_COL vec3(0.6,0.6,0.9)
 #define LIGHT_COL vec3(1.0,0.9,0.6)
+#define AO_COL vec3(0.5)
 
 #define DE de_main
 #define COL col_main
 #define DOF 0.0
-#define FOCAL_LENGTH 0.5
+#define FOCAL_LENGTH 0.2
 #define SHADOW_MULT 0.5
-#define AA_LEVEL 2
+#define AA_LEVEL 1
 #define USE_SHADDOW true
-#define AO_LEVEL 0.01
+#define AO_LEVEL 0.005
 #define REFLECTION_LEVEL 0
 #define REFLECTION_BLEND 0.5
 #define MOTION_BLUR_LEVEL 1
@@ -33,7 +34,7 @@ uniform float iSlider;
 #define USE_ORTHOGONAL false
 #define ZOOM 2.0
 
-const vec4 LIGHT_DIR = vec4(0.36, 0.80, 0.48, 0.0);
+const vec4 LIGHT_DIR = vec4(-0.36, 0.48, 0.80, 0.0);
 
 float rand(float s, float minV, float maxV) {
 	float r = sin(s*s*27.12345 + 1000.9876 / (s*s + 1e-5));
@@ -53,16 +54,15 @@ float smin(float a, float b, float k) {
 void planeFold(inout vec4 z, vec3 n, float d=0.0) {
 	z.xyz -= 2.0 * min(0.0, dot(z.xyz, n) - d) * n;
 }
-void absFold(inout vec4 z) {
-	z.xyz = abs(z.xyz);
+void absFold(inout vec4 z, vec3 c) {
+	z.xyz = abs(z.xyz - c) + c;
 }
 void sphereFold(inout vec4 z, float minR, float maxR) {
 	float r2 = dot(z.xyz, z.xyz);
 	z *= max(maxR / max(minR, r2), 1.0);
-	z.w += 1.0;
 }
-void boxFold(inout vec4 z, float foldLimit) {
-	z.xyz = clamp(z.xyz, -foldLimit, foldLimit) * 2.0 - z.xyz;
+void boxFold(inout vec4 z, vec3 r) {
+	z.xyz = clamp(z.xyz, -r, r) * 2.0 - z.xyz;
 }
 void sierpinskiFold(inout vec4 z) {
 	z.xy -= min(z.x + z.y, 0.0);
@@ -129,23 +129,12 @@ float de_sierpinski_tetrahedron(vec4 z) {
 	}
 	return de_tetrahedron(z, 1.0);
 }
-float de_menger(vec4 z) {
-	for(int i = 0; i < 12; i++) {
-		absFold(z);
-		sort(z);
-		z   *= 3.0;
-		z.x -= 2.0;
-		z.y -= 2.0;
-		z.z  = 1.0 - abs(z.z - 1.0);
-	}
-	return de_box(z, vec3(1.0));
-}
 float de_mandelbox(vec4 z) {
 	vec4 offset = z;
 	vec4 scale = vec4(2.0);
 	scale.w = abs(scale.w);
 	for (int n = 0; n < NUM_ITERS; n++) {
-		boxFold(z, 1.0);
+		boxFold(z, vec3(1.0));
 		sphereFold(z, 0.5, 1.0);
 		z = scale*z + offset;
 	}
@@ -166,7 +155,7 @@ vec3 col_mandelbox(vec4 offset) {
 	vec4 scale = vec4(2.0);
 	scale.w = abs(scale.w);
 	for (int n = 0; n < NUM_ITERS; n++) {
-		boxFold(z, 1.0);
+		boxFold(z, vec3(1.0));
 		sphereFold(z, 0.5, 1.0);
 		z = scale*z + offset;
 		minZ = min(minZ, abs(z.xyz) / (n + 1));
@@ -223,7 +212,7 @@ vec3 scene(inout vec4 origin, inout vec4 ray, float distToCenter) {
 	float td = d_s_td_m.z;
 
 	//Determine the color for this pixel
-	vec3 col = BG_LVL * distToCenter;
+	vec3 col = BG_COL * distToCenter;
 	if (d < MIN_DIST) {
 		//Get the surface normal
 		vec4 e = vec4(MIN_DIST, 0.0, 0.0, 0.0);
@@ -261,7 +250,7 @@ vec3 scene(inout vec4 origin, inout vec4 ray, float distToCenter) {
 
 		//Add small amount of ambient occlusion
 		float a = 1.0 / (1.0 + s * AO_LEVEL);
-		col = a*col + (1.0 - a)*BG_LVL;
+		col = a*col + (1.0 - a)*AO_COL;
 
 		//Add any ambient light at the end
 		col += AMBIENT_LIGHT;
@@ -308,7 +297,7 @@ void main() {
 
 				//Cast the first ray
 				vec4 p = mat[3];
-				//p += mat * vec4(0,0,2,0);
+				//p += mat * vec4(0,0,1.0,0);
 				if (USE_ORTHOGONAL) {
 					p += mat * vec4(uv.x, uv.y, 0.0, 0.0) * ZOOM;
 				} else {
