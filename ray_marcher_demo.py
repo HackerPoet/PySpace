@@ -72,6 +72,14 @@ keyvars = [1.5, 1.5, 2.0, 1.0, 1.0, 1.0]
 #----------------------------------------------
 #            Fractal Examples Below
 #----------------------------------------------
+def infinite_spheres():
+	obj = Object()
+	obj.add(FoldRepeatX(2.0))
+	obj.add(FoldRepeatY(2.0))
+	obj.add(FoldRepeatZ(2.0))
+	obj.add(Sphere(0.5, (1.0, 1.0, 1.0), color=(0.9,0.9,0.5)))
+	return obj
+
 def butterweed_hills():
 	obj = Object()
 	obj.add(OrbitInitZero())
@@ -229,7 +237,7 @@ if __name__ == '__main__':
 	#======================================================
 	#               Change the fractal here
 	#======================================================
-	obj_render = sierpinski_tetrahedron()
+	obj_render = tree_planet()
 	#======================================================
 
 	#======================================================
