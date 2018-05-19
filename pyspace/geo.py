@@ -49,6 +49,28 @@ class Box:
 	def glsl_col(self):
 		return make_color(self)
 
+class Tetrahedron:
+	def __init__(self, r=1.0, c=(0,0,0), color=(1,1,1)):
+		self.r = set_global_float(r)
+		self.c = set_global_vec3(c)
+		self.color = color
+
+	def DE(self, p):
+		c = get_global(self.c)
+		r = get_global(self.r)
+		a = p[:3] - c
+		md = max(-a[0] - a[1] - a[2], a[0] + a[1] - a[2], -a[0] + a[1] + a[2], a[0] - a[1] + a[2])
+		return (md - r) / (p[3] * math.sqrt(3.0));
+
+	def NP(self, p):
+		raise Exception("Not implemented")
+
+	def glsl(self):
+		return 'de_tetrahedron(p' + cond_offset(self.c) + ', ' + float_str(self.r) + ')'
+
+	def glsl_col(self):
+		return make_color(self)
+
 class InfCross:
 	def __init__(self, r=1.0, c=(0,0,0), color=(1,1,1)):
 		self.r = set_global_float(r)

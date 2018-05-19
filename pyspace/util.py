@@ -15,12 +15,20 @@ def get_sub_keys(v):
 	return [k for k in v if type(k) is str]
 
 def to_vec3(v):
-	if type(v) is float:
+	if isinstance(v, (float, int)):
 		return np.array([v, v, v], dtype=np.float32)
 	elif len(get_sub_keys(v)) > 0:
 		return v
 	else:
 		return np.array([v[0], v[1], v[2]], dtype=np.float32)
+
+def to_str(x):
+	if type(x) is bool:
+		return "1" if x else "0"
+	elif isinstance(x, (list, tuple)):
+		return vec3_str(x)
+	else:
+		return str(x)
 
 def float_str(x):
 	if type(x) is str:
@@ -31,10 +39,18 @@ def float_str(x):
 def vec3_str(v):
 	if type(v) is str:
 		return '_' + v
-	elif type(v) is float:
+	elif isinstance(v, (float, int)):
 		return 'vec3(' + str(v) + ')'
 	else:
 		return 'vec3(' + float_str(v[0]) + ',' + float_str(v[1]) + ',' + float_str(v[2]) + ')'
+
+def vec3_eq(v, val):
+	if type(v) is str:
+		return False
+	for i in xrange(3):
+		if v[i] != val[i]:
+			return False
+	return True
 
 def smin(a, b, k):
 	h = min(max(0.5 + 0.5*(b - a)/k, 0.0), 1.0)
@@ -57,7 +73,7 @@ def set_global_vec3(k):
 	if type(k) is str:
 		_PYSPACE_GLOBAL_VARS[k] = to_vec3((0,0,0))
 		return k
-	elif type(k) is float:
+	elif isinstance(k, (float, int)):
 		return to_vec3(k)
 	else:
 		sk = get_sub_keys(k)

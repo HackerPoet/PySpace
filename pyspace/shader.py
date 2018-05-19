@@ -1,14 +1,13 @@
 from ctypes import *
 from OpenGL.GL import *
-from util import _PYSPACE_GLOBAL_VARS, to_vec3
+from util import _PYSPACE_GLOBAL_VARS, to_vec3, to_str
+import camera
+import os
 
 class Shader:
-	def __init__(self):
-		self.objs = []
+	def __init__(self, obj):
+		self.obj = obj
 		self.keys = {}
-
-	def add(self, obj):
-		self.objs.append(obj)
 
 	def set(self, key, val):
 		if key in _PYSPACE_GLOBAL_VARS:
@@ -23,10 +22,27 @@ class Shader:
 			else:
 				glUniform3fv(key_id, 1, val)
 
-	def compile(self):
+	def get(self, key):
+		if key in _PYSPACE_GLOBAL_VARS:
+			return _PYSPACE_GLOBAL_VARS[key]
+		return None
+
+	def compile(self, cam=camera.Camera()):
 		#Open the shader source
-		v_shader = open('vert.glsl').read()
-		f_shader = open('frag.glsl').read()
+		vert_dir = os.path.join(os.path.dirname(__file__), 'vert.glsl')
+		frag_dir = os.path.join(os.path.dirname(__file__), 'frag.glsl')
+		v_shader = open(vert_dir).read()
+		f_shader = open(frag_dir).read()
+
+		#Create code for all defines
+		define_code = ''
+		for k in cam.params:
+			param = to_str(cam.params[k])
+			define_code += '#define ' + k + ' ' + param + '\n'
+		define_code += '#define DE de_' + self.obj.name + '\n'
+		define_code += '#define COL col_' + self.obj.name + '\n'
+		split_ix = f_shader.index('// [/pydefine]')
+		f_shader = f_shader[:split_ix] + define_code + f_shader[split_ix:]
 
 		#Create code for all keys
 		var_code = ''
@@ -38,15 +54,20 @@ class Shader:
 		f_shader = f_shader[:split_ix] + var_code + f_shader[split_ix:]
 
 		#Create code for all pyspace
-		space_code = ''
-		for obj in self.objs:
-			space_code += obj.compiled()
+		nested_refs = {}
+		space_code = self.obj.compiled(nested_refs)
+
+		#Also add forward declarations
+		forwared_decl_code = ''
+		for k in nested_refs:
+			forwared_decl_code += nested_refs[k].forwared_decl()
+		space_code = forwared_decl_code + space_code
 
 		split_ix = f_shader.index('// [/pyspace]')
 		f_shader = f_shader[:split_ix] + space_code + f_shader[split_ix:]
 
-		#Debugging ONLY
-		open('frag_gen.glsl', 'w').write(f_shader)
+		#Debugging the shader
+		#open('frag_gen.glsl', 'w').write(f_shader)
 
 		#Compile program
 		program = self.compile_program(v_shader, f_shader)

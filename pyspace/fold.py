@@ -19,8 +19,27 @@ class FoldPlane:
 			q[:3] -= 2.0 * (np.dot(q[:3], n) - d) * n
 
 	def glsl(self):
-		return '\tplaneFold(p, ' + vec3_str(self.n) + ', ' + float_str(self.d) + ');\n'
+		if vec3_eq(self.n, (1,0,0)):
+			return '\tp.x = abs(p.x - ' + float_str(self.d) + ') + ' + float_str(self.d) + ';\n'
+		elif vec3_eq(self.n, (0,1,0)):
+			return '\tp.y = abs(p.y - ' + float_str(self.d) + ') + ' + float_str(self.d) + ';\n'
+		elif vec3_eq(self.n, (0,0,1)):
+			return '\tp.z = abs(p.z - ' + float_str(self.d) + ') + ' + float_str(self.d) + ';\n'
+		elif vec3_eq(self.n, (-1,0,0)):
+			return '\tp.x = -abs(p.x + ' + float_str(self.d) + ') - ' + float_str(self.d) + ';\n'
+		elif vec3_eq(self.n, (0,-1,0)):
+			return '\tp.y = -abs(p.y + ' + float_str(self.d) + ') - ' + float_str(self.d) + ';\n'
+		elif vec3_eq(self.n, (0,0,-1)):
+			return '\tp.z = -abs(p.z + ' + float_str(self.d) + ') - ' + float_str(self.d) + ';\n'
+		else:
+			return '\tplaneFold(p, ' + vec3_str(self.n) + ', ' + float_str(self.d) + ');\n'
 
+'''
+EQUIVALENT FOLD:
+  FoldPlane((1, 0, 0), c_x))
+  FoldPlane((0, 1, 0), c_y))
+  FoldPlane((0, 0, 1), c_z))
+'''
 class FoldAbs:
 	def __init__(self, c=(0,0,0)):
 		self.c = set_global_vec3(c)
@@ -36,8 +55,17 @@ class FoldAbs:
 		if p[2] < c[2]: q[2] = 2*c[0] - q[2]
 
 	def glsl(self):
-		return '\tabsFold(p, ' + vec3_str(self.c) + ');\n'
+		if vec3_eq(self.c, (0,0,0)):
+			return '\tp.xyz = abs(p.xyz);\n'
+		else:
+			return '\tabsFold(p, ' + vec3_str(self.c) + ');\n'
 
+'''
+EQUIVALENT FOLD:
+  FoldPlane((inv_sqrt2, inv_sqrt2, 0)))
+  FoldPlane((inv_sqrt2, 0, inv_sqrt2)))
+  FoldPlane((0, inv_sqrt2, inv_sqrt2)))
+'''
 class FoldSierpinski:
 	def __init__(self):
 		pass
@@ -62,6 +90,36 @@ class FoldSierpinski:
 	def glsl(self):
 		return '\tsierpinskiFold(p);\n'
 
+'''
+EQUIVALENT FOLD:
+  FoldPlane((inv_sqrt2, -inv_sqrt2, 0)))
+  FoldPlane((inv_sqrt2, 0, -inv_sqrt2)))
+  FoldPlane((0, inv_sqrt2, -inv_sqrt2)))
+'''
+class FoldMenger:
+	def __init__(self):
+		pass
+
+	def fold(self, p):
+		if p[0] < p[1]:
+			p[[0,1]] = p[[1,0]]
+		if p[0] < p[2]:
+			p[[0,2]] = p[[2,0]]
+		if p[1] < p[2]:
+			p[[2,1]] = p[[1,2]]
+
+	def unfold(self, p, q):
+		mx = max(p[0], p[1])
+		if min(p[0], p[1]) < min(mx, p[2]):
+			q[[2,1]] = q[[1,2]]
+		if mx < p[2]:
+			q[[0,2]] = q[[2,0]]
+		if p[0] < p[1]:
+			q[[0,1]] = q[[1,0]]
+
+	def glsl(self):
+		return '\tmengerFold(p);\n'
+
 class FoldScaleTranslate:
 	def __init__(self, s=1.0, t=(0,0,0)):
 		self.s = set_global_float(s)
@@ -78,8 +136,11 @@ class FoldScaleTranslate:
 	def glsl(self):
 		ret_str = ''
 		if self.s != 1.0:
-			ret_str += '\tp.xyz *= ' + float_str(self.s) + ';\n'
-			ret_str += '\tp.w *= abs(' + float_str(self.s) + ');\n'
+			if isinstance(self.s, (float, int)) and self.s >= 0:
+				ret_str += '\tp *= ' + float_str(self.s) + ';\n'
+			else:
+				ret_str += '\tp.xyz *= ' + float_str(self.s) + ';\n'
+				ret_str += '\tp.w *= abs(' + float_str(self.s) + ');\n'
 		if not np.array_equal(self.t, np.zeros((3,), dtype=np.float32)):
 			ret_str += '\tp.xyz += ' + vec3_str(self.t) + ';\n'
 		return ret_str
@@ -171,7 +232,10 @@ class FoldRotateX:
 		q[1], q[2] = (c*q[1] + s*q[2]), (c*q[2] - s*q[1])
 
 	def glsl(self):
-		return '\trotX(p, ' + float_str(self.a) + ');\n'
+		if isinstance(self.a, (float, int)):
+			return '\trotX(p, ' + float_str(math.sin(self.a)) + ', ' + float_str(math.cos(self.a)) + ');\n'
+		else:
+			return '\trotX(p, ' + float_str(self.a) + ');\n'
 
 class FoldRotateY:
 	def __init__(self, a):
@@ -188,7 +252,10 @@ class FoldRotateY:
 		q[2], q[0] = (c*q[2] + s*q[0]), (c*q[0] - s*q[2])
 
 	def glsl(self):
-		return '\trotY(p, ' + float_str(self.a) + ');\n'
+		if isinstance(self.a, (float, int)):
+			return '\trotY(p, ' + float_str(math.sin(self.a)) + ', ' + float_str(math.cos(self.a)) + ');\n'
+		else:
+			return '\trotY(p, ' + float_str(self.a) + ');\n'
 
 class FoldRotateZ:
 	def __init__(self, a):
@@ -205,7 +272,10 @@ class FoldRotateZ:
 		q[0], q[1] = (c*q[0] + s*q[1]), (c*q[1] - s*q[0])
 
 	def glsl(self):
-		return '\trotZ(p, ' + float_str(self.a) + ');\n'
+		if isinstance(self.a, (float, int)):
+			return '\trotZ(p, ' + float_str(math.sin(self.a)) + ', ' + float_str(math.cos(self.a)) + ');\n'
+		else:
+			return '\trotZ(p, ' + float_str(self.a) + ');\n'
 
 class FoldRepeatX:
 	def __init__(self, m):
