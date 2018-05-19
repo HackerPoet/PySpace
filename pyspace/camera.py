@@ -42,7 +42,7 @@ class Camera:
 		self.params['DIFFUSE_ENHANCED_ENABLED'] = True
 
 		# Amount of light captured by the camera.
-		# Can be used to increase/decrease brightness incase pixels are over-saturated.
+		# Can be used to increase/decrease brightness in case pixels are over-saturated.
 		# Recommended Range: 0.1 to 10.0
 		self.params['EXPOSURE'] = 1.0
 

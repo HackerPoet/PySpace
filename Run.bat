@@ -1,2 +1,2 @@
-python ray_marcher.py
+python ray_marcher_demo.py
 pause

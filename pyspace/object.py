@@ -14,8 +14,8 @@ class Object:
 		d = 1e20
 		for t in self.trans:
 			if hasattr(t, 'fold'):
-				#if hasattr(t, 'o'):
-				#	t.o = origin
+				if hasattr(t, 'o'):
+					t.o = origin
 				t.fold(p)
 			elif hasattr(t, 'DE'):
 				d = min(d, t.DE(p))
@@ -32,8 +32,8 @@ class Object:
 		for t in self.trans:
 			undo.append((t, np.copy(p)))
 			if hasattr(t, 'fold'):
-				#if hasattr(fold, 'o'):
-				#	fold.o = origin
+				if hasattr(fold, 'o'):
+					fold.o = origin
 				t.fold(p)
 			elif hasattr(t, 'NP'): pass
 			elif hasattr(t, 'orbit'): pass

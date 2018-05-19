@@ -27,7 +27,7 @@ class Shader:
 			return _PYSPACE_GLOBAL_VARS[key]
 		return None
 
-	def compile(self, cam=camera.Camera()):
+	def compile(self, cam):
 		#Open the shader source
 		vert_dir = os.path.join(os.path.dirname(__file__), 'vert.glsl')
 		frag_dir = os.path.join(os.path.dirname(__file__), 'frag.glsl')
