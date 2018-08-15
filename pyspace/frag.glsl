@@ -28,7 +28,7 @@ float smin(float a, float b, float k) {
 //   Space folding functions
 //
 //##########################################
-void planeFold(inout vec4 z, vec3 n, float d=0.0) {
+void planeFold(inout vec4 z, vec3 n, float d) {
 	z.xyz -= 2.0 * min(0.0, dot(z.xyz, n) - d) * n;
 }
 void absFold(inout vec4 z, vec3 c) {
