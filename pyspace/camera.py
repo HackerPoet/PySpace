@@ -47,7 +47,7 @@ class Camera:
 		self.params['EXPOSURE'] = 1.0
 
 		# Field of view of the camera in degrees
-		# NOTE: This will have no effect if ORTHOGONAL_PROJECTION is enabled.
+		# NOTE: This will have no effect if ORTHOGONAL_PROJECTION or ODS is enabled.
 		# Recommended Range: 20.0 to 120.0
 		self.params['FIELD_OF_VIEW'] = 60.0
 
@@ -91,6 +91,9 @@ class Camera:
 		# Minimum march distance until a ray is considered intersecting.
 		# Recommended Range: 0.000001 to 0.01
 		self.params['MIN_DIST'] = 0.00001
+
+		# If true will render an omnidirectional stereo 360 projection.
+		self.params['ODS'] = False
 
 		# Determines if the projection view should be orthographic instead of perspective.
 		self.params['ORTHOGONAL_PROJECTION'] = False

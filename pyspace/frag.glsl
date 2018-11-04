@@ -4,6 +4,7 @@
 uniform mat4 iMat;
 uniform mat4 iPrevMat;
 uniform vec2 iResolution;
+uniform float iIPD;
 
 // [pydefine]
 // [/pydefine]
@@ -247,24 +248,44 @@ void main() {
 				vec2 delta2 = vec2(rand(i,0,1), rand(j+0.1,0,1));
 				vec4 dxy = vec4(delta2.x, delta2.y, 0.0, 0.0) * DEPTH_OF_FIELD_STRENGTH / iResolution.x;
 
-				vec2 screen_pos = (gl_FragCoord.xy + delta) / iResolution.xy;
-				vec2 uv = 2*screen_pos - 1;
-				uv.x *= iResolution.x / iResolution.y;
-
-				//Convert screen coordinate to 3d ray
-				#if ORTHOGONAL_PROJECTION
-					vec4 ray = vec4(0.0, 0.0, -FOCAL_DIST, 0.0);
-					ray = mat * normalize(ray);
+				#if ODS
+					//Get the normalized screen coordinate
+					vec2 screen_pos;
+					float scale;
+					vec2 ods_coord = vec2(gl_FragCoord.x, gl_FragCoord.y * 2);
+					if (ods_coord.y < iResolution.y) {
+						screen_pos = (ods_coord + delta) / iResolution.xy;
+						scale = -iIPD*0.5;
+					} else {
+						screen_pos = (ods_coord - vec2(0, iResolution.y) + delta) / iResolution.xy;
+						scale = iIPD*0.5;
+					}
+					float theta = -2*M_PI*screen_pos.x;
+					float phi = -0.5*M_PI + screen_pos.y*M_PI;
+					scale *= cos(phi);
+					vec4 p = mat[3] - mat * vec4(cos(theta) * scale, 0, sin(theta) * scale, 0);
+					vec4 ray = mat * vec4(sin(theta)*cos(phi), sin(phi), cos(theta)*cos(phi), 0);
 				#else
-					vec4 ray = normalize(vec4(uv.x, uv.y, -FOCAL_DIST, 0.0));
-					ray = mat * normalize(ray * DEPTH_OF_FIELD_DISTANCE + dxy);
-				#endif
+					//Get normalized screen coordinate
+					vec2 screen_pos = (gl_FragCoord.xy + delta) / iResolution.xy;
+					vec2 uv = 2*screen_pos - 1;
+					uv.x *= iResolution.x / iResolution.y;
 
-				//Cast the first ray
-				#if ORTHOGONAL_PROJECTION
-					vec4 p = mat[3] + mat * vec4(uv.x, uv.y, 0.0, 0.0) * ORTHOGONAL_ZOOM;
-				#else
-					vec4 p = mat[3] - mat * dxy;
+					//Convert screen coordinate to 3d ray
+					#if ORTHOGONAL_PROJECTION
+						vec4 ray = vec4(0.0, 0.0, -FOCAL_DIST, 0.0);
+						ray = mat * normalize(ray);
+					#else
+						vec4 ray = normalize(vec4(uv.x, uv.y, -FOCAL_DIST, 0.0));
+						ray = mat * normalize(ray * DEPTH_OF_FIELD_DISTANCE + dxy);
+					#endif
+
+					//Cast the first ray
+					#if ORTHOGONAL_PROJECTION
+						vec4 p = mat[3] + mat * vec4(uv.x, uv.y, 0.0, 0.0) * ORTHOGONAL_ZOOM;
+					#else
+						vec4 p = mat[3] - mat * dxy;
+					#endif
 				#endif
 
 				//Reflect light if needed

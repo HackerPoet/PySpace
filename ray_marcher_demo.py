@@ -256,9 +256,11 @@ if __name__ == '__main__':
 	matID = glGetUniformLocation(program, "iMat");
 	prevMatID = glGetUniformLocation(program, "iPrevMat");
 	resID = glGetUniformLocation(program, "iResolution");
+	ipdID = glGetUniformLocation(program, "iIPD");
 
 	glUseProgram(program)
-	glUniform2fv(resID, 1, win_size);
+	glUniform2fv(resID, 1, win_size)
+	glUniform1f(ipdID, 0.04)
 
 	mat = np.identity(4, np.float32)
 	mat[3,:3] = np.array(start_pos)
