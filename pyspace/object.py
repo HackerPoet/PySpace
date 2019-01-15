@@ -1,5 +1,5 @@
 import numpy as np
-from util import *
+from pyspace.util import *
 
 class Object:
 	def __init__(self):

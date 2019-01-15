@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from util import *
+from pyspace.util import *
 
 class Sphere:
 	def __init__(self, r=1.0, c=(0,0,0), color=(1,1,1)):

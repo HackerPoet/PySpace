@@ -1,7 +1,7 @@
 from ctypes import *
 from OpenGL.GL import *
-from util import _PYSPACE_GLOBAL_VARS, to_vec3, to_str
-import camera
+from pyspace.util import _PYSPACE_GLOBAL_VARS, to_vec3, to_str
+from pyspace import camera
 import os
 
 class Shader:
@@ -89,7 +89,7 @@ class Shader:
 		if not status.value:
 			self.print_log(shader)
 			glDeleteShader(shader)
-			raise ValueError, 'Shader compilation failed'
+			raise ValueError('Shader compilation failed')
 		return shader
 
 	def compile_program(self, vertex_source, fragment_source):
@@ -98,11 +98,11 @@ class Shader:
 		program = glCreateProgram()
 
 		if vertex_source:
-			print "Compiling Vertex Shader..."
+			print("Compiling Vertex Shader...")
 			vertex_shader = self.compile_shader(vertex_source, GL_VERTEX_SHADER)
 			glAttachShader(program, vertex_shader)
 		if fragment_source:
-			print "Compiling Fragment Shader..."
+			print("Compiling Fragment Shader...")
 			fragment_shader = self.compile_shader(fragment_source, GL_FRAGMENT_SHADER)
 			glAttachShader(program, fragment_shader)
 
@@ -121,4 +121,4 @@ class Shader:
 
 		if length.value > 0:
 			log = create_string_buffer(length.value)
-			print glGetShaderInfoLog(shader)
+			print(glGetShaderInfoLog(shader))
