@@ -83,7 +83,7 @@ def infinite_spheres():
 def butterweed_hills():
 	obj = Object()
 	obj.add(OrbitInitZero())
-	for i in xrange(30):
+	for i in range(30):
 		obj.add(FoldAbs())
 		obj.add(FoldScaleTranslate(1.5, (-1.0,-0.5,-0.2)))
 		obj.add(OrbitSum((0.5, 0.03, 0.0)))
@@ -95,7 +95,7 @@ def butterweed_hills():
 def mandelbox():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in xrange(16):
+	for i in range(16):
 		obj.add(FoldBox(1.0))
 		obj.add(FoldSphere(0.5, 1.0))
 		obj.add(FoldScaleOrigin(2.0))
@@ -106,7 +106,7 @@ def mandelbox():
 def mausoleum():
 	obj = Object()
 	obj.add(OrbitInitZero())
-	for i in xrange(8):
+	for i in range(8):
 		obj.add(FoldBox(0.34))
 		obj.add(FoldMenger())
 		obj.add(FoldScaleTranslate(3.28, (-5.27,-0.34,0.0)))
@@ -117,7 +117,7 @@ def mausoleum():
 
 def menger():
 	obj = Object()
-	for i in xrange(8):
+	for i in range(8):
 		obj.add(FoldAbs())
 		obj.add(FoldMenger())
 		obj.add(FoldScaleTranslate(3.0, (-2,-2,0)))
@@ -128,7 +128,7 @@ def menger():
 def tree_planet():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in xrange(30):
+	for i in range(30):
 		obj.add(FoldRotateY(0.44))
 		obj.add(FoldAbs())
 		obj.add(FoldMenger())
@@ -141,7 +141,7 @@ def tree_planet():
 def sierpinski_tetrahedron():
 	obj = Object()
 	obj.add(OrbitInitZero())
-	for i in xrange(9):
+	for i in range(9):
 		obj.add(FoldSierpinski())
 		obj.add(FoldScaleTranslate(2, -1))
 	obj.add(Tetrahedron(color=(0.8,0.8,0.5)))
@@ -150,7 +150,7 @@ def sierpinski_tetrahedron():
 def snow_stadium():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in xrange(30):
+	for i in range(30):
 		obj.add(FoldRotateY(3.33))
 		obj.add(FoldSierpinski())
 		obj.add(FoldRotateX(0.15))
@@ -163,7 +163,7 @@ def snow_stadium():
 def test_fractal():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in xrange(20):
+	for i in range(20):
 		obj.add(FoldSierpinski())
 		obj.add(FoldMenger())
 		obj.add(FoldRotateY(math.pi/2))
@@ -180,7 +180,7 @@ def test_fractal():
 def interp_data(x, f=2.0):
 	new_dim = int(x.shape[0]*f)
 	output = np.empty((new_dim,) + x.shape[1:], dtype=np.float32)
-	for i in xrange(new_dim):
+	for i in range(new_dim):
 		a, b1 = math.modf(float(i) / f)
 		b2 = min(b1 + 1, x.shape[0] - 1)
 		output[i] = x[int(b1)]*(1-a) + x[int(b2)]*a
@@ -251,7 +251,7 @@ if __name__ == '__main__':
 	
 	shader = Shader(obj_render)
 	program = shader.compile(camera)
-	print "Compiled!"
+	print("Compiled!")
 
 	matID = glGetUniformLocation(program, "iMat");
 	prevMatID = glGetUniformLocation(program, "iPrevMat");
@@ -265,7 +265,7 @@ if __name__ == '__main__':
 	mat = np.identity(4, np.float32)
 	mat[3,:3] = np.array(start_pos)
 	prevMat = np.copy(mat)
-	for i in xrange(len(keyvars)):
+	for i in range(len(keyvars)):
 		shader.set(str(i), keyvars[i])
 		
 	recording = None
@@ -297,7 +297,7 @@ if __name__ == '__main__':
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_r:
 					if recording is None:
-						print "Recording..."
+						print("Recording...")
 						recording = []
 						rec_vars = []
 					else:
@@ -305,7 +305,7 @@ if __name__ == '__main__':
 						np.save('rec_vars.npy', np.array(rec_vars, dtype=np.float32))
 						recording = None
 						rec_vars = None
-						print "Finished Recording."
+						print("Finished Recording.")
 				elif event.key == pygame.K_p:
 					start_playback()
 				elif event.key == pygame.K_s:
@@ -328,18 +328,18 @@ if __name__ == '__main__':
 		if all_keys[pygame.K_LSHIFT]:   rate *= 0.1
 		elif all_keys[pygame.K_RSHIFT]: rate *= 10.0
 
-		if all_keys[pygame.K_INSERT]:   keyvars[0] += rate; print keyvars
-		if all_keys[pygame.K_DELETE]:   keyvars[0] -= rate; print keyvars
-		if all_keys[pygame.K_HOME]:     keyvars[1] += rate; print keyvars
-		if all_keys[pygame.K_END]:      keyvars[1] -= rate; print keyvars
-		if all_keys[pygame.K_PAGEUP]:   keyvars[2] += rate; print keyvars
-		if all_keys[pygame.K_PAGEDOWN]: keyvars[2] -= rate; print keyvars
-		if all_keys[pygame.K_KP7]:      keyvars[3] += rate; print keyvars
-		if all_keys[pygame.K_KP4]:      keyvars[3] -= rate; print keyvars
-		if all_keys[pygame.K_KP8]:      keyvars[4] += rate; print keyvars
-		if all_keys[pygame.K_KP5]:      keyvars[4] -= rate; print keyvars
-		if all_keys[pygame.K_KP9]:      keyvars[5] += rate; print keyvars
-		if all_keys[pygame.K_KP6]:      keyvars[5] -= rate; print keyvars
+		if all_keys[pygame.K_INSERT]:   keyvars[0] += rate; print(keyvars)
+		if all_keys[pygame.K_DELETE]:   keyvars[0] -= rate; print(keyvars)
+		if all_keys[pygame.K_HOME]:     keyvars[1] += rate; print(keyvars)
+		if all_keys[pygame.K_END]:      keyvars[1] -= rate; print(keyvars)
+		if all_keys[pygame.K_PAGEUP]:   keyvars[2] += rate; print(keyvars)
+		if all_keys[pygame.K_PAGEDOWN]: keyvars[2] -= rate; print(keyvars)
+		if all_keys[pygame.K_KP7]:      keyvars[3] += rate; print(keyvars)
+		if all_keys[pygame.K_KP4]:      keyvars[3] -= rate; print(keyvars)
+		if all_keys[pygame.K_KP8]:      keyvars[4] += rate; print(keyvars)
+		if all_keys[pygame.K_KP5]:      keyvars[4] -= rate; print(keyvars)
+		if all_keys[pygame.K_KP9]:      keyvars[5] += rate; print(keyvars)
+		if all_keys[pygame.K_KP6]:      keyvars[5] -= rate; print(keyvars)
 
 		if playback is None:
 			prev_mouse_pos = mouse_pos
@@ -402,7 +402,7 @@ if __name__ == '__main__':
 				keyvars = playback_vars[playback_ix].tolist()
 				playback_ix += 1
 
-		for i in xrange(3):
+		for i in range(3):
 			shader.set(str(i), keyvars[i])
 		shader.set('v', np.array(keyvars[3:6]))
 		shader.set('pos', mat[3,:3])

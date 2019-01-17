@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from util import *
+from pyspace.util import *
 
 class FoldPlane:
 	def __init__(self, n, d=0.0):
