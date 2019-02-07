@@ -14,7 +14,7 @@ from OpenGL.GL import *
 from pygame.locals import *
 
 import os
-os.environ['SDL_VIDEO_WINDOW_POS'] = "700,100"
+os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 #Size of the window and rendering
 win_size = (1280, 720)
