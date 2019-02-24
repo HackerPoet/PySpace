@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import pygame, sys, math, random, os
 import numpy as np
 import pyspace
@@ -29,7 +31,7 @@ gimbal_lock = False
 look_speed = 0.003
 
 #Use this avoids collisions with the fractal
-auto_velocity = True 
+auto_velocity = True
 auto_multiplier = 2.0
 
 #Maximum velocity of the camera
@@ -146,7 +148,7 @@ def sierpinski_tetrahedron():
 		obj.add(FoldScaleTranslate(2, -1))
 	obj.add(Tetrahedron(color=(0.8,0.8,0.5)))
 	return obj
-	
+
 def snow_stadium():
 	obj = Object()
 	obj.add(OrbitInitInf())
@@ -159,7 +161,7 @@ def snow_stadium():
 		obj.add(OrbitMinAbs(1.0))
 	obj.add(Box(4.8, color='orbit'))
 	return obj
-	
+
 def test_fractal():
 	obj = Object()
 	obj.add(OrbitInitInf())
@@ -185,7 +187,7 @@ def interp_data(x, f=2.0):
 		b2 = min(b1 + 1, x.shape[0] - 1)
 		output[i] = x[int(b1)]*(1-a) + x[int(b2)]*a
 	return output
-	
+
 def make_rot(angle, axis_ix):
 	s = math.sin(angle)
 	c = math.cos(angle)
@@ -227,7 +229,7 @@ def reorthogonalize(mat):
 #
 #    You can press 's' anytime for a screenshot.
 #---------------------------------------------------
-	
+
 if __name__ == '__main__':
 	pygame.init()
 	window = pygame.display.set_mode(win_size, OPENGL | DOUBLEBUF)
@@ -248,7 +250,7 @@ if __name__ == '__main__':
 	camera['ANTIALIASING_SAMPLES'] = 1
 	camera['AMBIENT_OCCLUSION_STRENGTH'] = 0.01
 	#======================================================
-	
+
 	shader = Shader(obj_render)
 	program = shader.compile(camera)
 	print("Compiled!")
@@ -267,7 +269,7 @@ if __name__ == '__main__':
 	prevMat = np.copy(mat)
 	for i in range(len(keyvars)):
 		shader.set(str(i), keyvars[i])
-		
+
 	recording = None
 	rec_vars = None
 	playback = None
@@ -288,7 +290,7 @@ if __name__ == '__main__':
 		playback_vars = interp_data(playback_vars, 2)
 		playback_ix = 0
 		prevMat = playback[0]
-	
+
 	clock = pygame.time.Clock()
 	while True:
 		for event in pygame.event.get():
@@ -314,7 +316,7 @@ if __name__ == '__main__':
 					sys.exit(0)
 
 		mat[3,:3] += vel / fps
-		
+
 		if auto_velocity:
 			de = obj_render.DE(mat[3]) * auto_multiplier
 			if not np.isfinite(de):

@@ -1,6 +1,12 @@
 # PySpace
 GLSL Fractal Ray Marcher in Python
 
+## Installation
+
+```bash
+pip install -r requirements.txt
+```
+
 ## Videos
 Overview: https://youtu.be/svLzmFuSBhk
 
