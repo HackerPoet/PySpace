@@ -47,7 +47,7 @@ def vec3_str(v):
 def vec3_eq(v, val):
 	if type(v) is str:
 		return False
-	for i in xrange(3):
+	for i in range(3):
 		if v[i] != val[i]:
 			return False
 	return True
