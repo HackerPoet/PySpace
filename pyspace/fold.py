@@ -205,17 +205,19 @@ class FoldSphere:
 		return '\tsphereFold(p,' + float_str(self.min_r) + ',' + float_str(self.max_r) + ');\n'
 
 class FoldInversion:
-	def __init__(self):
-		pass
+	def __init__(self, epsilon=1e-12):
+		self.epsilon = set_global_float(epsilon)
 
 	def fold(self, p):
-		p[:] /= (np.dot(p[:3], p[:3]) + 1e-12)
+		epsilon = get_global(self.epsilon)
+		p[:] *= 1.0 / (np.dot(p[:3], p[:3]) + epsilon)
 
 	def unfold(self, p, q):
-		q[:] *= (np.dot(p[:3], p[:3]) + 1e-12)
+		epsilon = get_global(self.epsilon)
+		q[:] *= (np.dot(p[:3], p[:3]) + epsilon)
 
 	def glsl(self):
-		return '\tp /= length(p.xyz) + 1e-12;\n'
+		return '\tp *= 1.0 / (dot(p.xyz, p.xyz) + ' + float_str(self.epsilon) + ');\n'
 
 class FoldRotateX:
 	def __init__(self, a):
