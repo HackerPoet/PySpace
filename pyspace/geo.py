@@ -156,3 +156,60 @@ class InfLine:
 
 	def glsl_col(self):
 		return make_color(self)
+
+class XPlane:
+	def __init__(self, x=0.0, color=(1,1,1)):
+		self.x = set_global_float(x)
+		self.color = color
+
+	def DE(self, p):
+		x = get_global(self.x)
+		return abs(p[0] - x) / p[3]
+
+	def NP(self, p):
+		x = get_global(self.x)
+		return np.array([x, p[1], p[2]])
+
+	def glsl(self):
+		return 'abs(p.x' + cond_subtract(self.x) + ') / p.w'
+
+	def glsl_col(self):
+		return make_color(self)
+
+class YPlane:
+	def __init__(self, x=0.0, color=(1,1,1)):
+		self.x = set_global_float(x)
+		self.color = color
+
+	def DE(self, p):
+		x = get_global(self.x)
+		return abs(p[1] - x) / p[3]
+
+	def NP(self, p):
+		x = get_global(self.x)
+		return np.array([p[0], x, p[2]])
+
+	def glsl(self):
+		return 'abs(p.y' + cond_subtract(self.x) + ') / p.w'
+
+	def glsl_col(self):
+		return make_color(self)
+
+class ZPlane:
+	def __init__(self, x=0.0, color=(1,1,1)):
+		self.x = set_global_float(x)
+		self.color = color
+
+	def DE(self, p):
+		x = get_global(self.x)
+		return abs(p[2] - x) / p[3]
+
+	def NP(self, p):
+		x = get_global(self.x)
+		return np.array([p[0], p[1], x])
+
+	def glsl(self):
+		return 'abs(p.z' + cond_subtract(self.x) + ') / p.w'
+
+	def glsl_col(self):
+		return make_color(self)
