@@ -86,6 +86,11 @@ def cond_offset(p):
 		return ' - vec4(' + vec3_str(p) + ', 0)'
 	return ''
 
+def cond_subtract(p):
+	if type(p) is str or p > 0:
+		return ' - ' + float_str(p)
+	return ''
+
 def make_color(geo):
 	if type(geo.color) is tuple or type(geo.color) is np.ndarray:
 		return 'vec4(' + vec3_str(geo.color) + ', ' + geo.glsl() + ')'
