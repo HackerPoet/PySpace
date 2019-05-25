@@ -329,3 +329,22 @@ class FoldRepeatZ:
 
 	def glsl(self):
 		return '\tp.z = abs(mod(p.z - ' + float_str(self.m) + '/2,' + float_str(self.m) + ') - ' + float_str(self.m) + '/2);\n'
+
+class FoldRepeatXYZ:
+	def __init__(self, m):
+		self.m = set_global_float(m)
+
+	def fold(self, p):
+		m = get_global(self.m)
+		p[:3] = abs((p[:3] - m/2) % m - m/2)
+
+	def unfold(self, p, q):
+		m = get_global(self.m)
+		a = (p[:3] - m/2) % m - m/2
+		if a[0] < 0.0: q[0] = -q[0]
+		if a[1] < 0.0: q[1] = -q[1]
+		if a[2] < 0.0: q[2] = -q[2]
+		q[:3] += p[:3] - a
+
+	def glsl(self):
+		return '\tp.xyz = abs(mod(p.xyz - ' + float_str(self.m) + '/2,' + float_str(self.m) + ') - ' + float_str(self.m) + '/2);\n'
