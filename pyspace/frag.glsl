@@ -144,7 +144,7 @@ vec4 ray_march(inout vec4 p, vec3 ray, float sharpness) {
 	return ray_march(p, vec4(ray, 0.0), sharpness);
 }
 
-vec3 scene(inout vec4 origin, inout vec4 ray, float vignette) {
+vec4 scene(inout vec4 origin, inout vec4 ray, float vignette) {
 	//Trace the ray
 	vec4 p = origin;
 	vec4 d_s_td_m = ray_march(p, ray, GLOW_SHARPNESS);
@@ -229,12 +229,11 @@ vec3 scene(inout vec4 origin, inout vec4 ray, float vignette) {
 			col += LIGHT_COLOR * sun_spec;
 		#endif
 	}
-
-	return col;
+	return vec4(col, td);
 }
 
 void main() {
-	vec3 col = vec3(0.0);
+	vec4 col = vec4(0.0);
 	for (int k = 0; k < MOTION_BLUR_LEVEL + 1; ++k) {
 		for (int i = 0; i < ANTIALIASING_SAMPLES; ++i) {
 			for (int j = 0; j < ANTIALIASING_SAMPLES; ++j) {
@@ -310,6 +309,7 @@ void main() {
 		}
 	}
 
-	col = col * EXPOSURE / (ANTIALIASING_SAMPLES * ANTIALIASING_SAMPLES * (MOTION_BLUR_LEVEL + 1));
-	gl_FragColor.rgb = clamp(col, 0.0, 1.0);
+	col /= (ANTIALIASING_SAMPLES * ANTIALIASING_SAMPLES * (MOTION_BLUR_LEVEL + 1));
+	gl_FragColor.rgb = clamp(col.xyz * EXPOSURE, 0.0, 1.0);
+	gl_FragDepth = min(col.w / MAX_DIST, 0.999);
 }
