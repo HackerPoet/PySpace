@@ -314,7 +314,7 @@ if __name__ == '__main__':
 						print("Finished Recording.")
 				elif event.key == pygame.K_p:
 					start_playback()
-				elif event.key == pygame.K_s:
+				elif event.key == pygame.K_c:
 					pygame.image.save(window, 'screenshot.png')
 				elif event.key == pygame.K_ESCAPE:
 					sys.exit(0)
@@ -373,13 +373,13 @@ if __name__ == '__main__':
 				mat[:3,:3] = reorthogonalize(mat[:3,:3])
 
 			acc = np.zeros((3,), dtype=np.float32)
-			if all_keys[pygame.K_LEFT]:
+			if all_keys[pygame.K_a]:
 				acc[0] -= speed_accel / fps
-			if all_keys[pygame.K_RIGHT]:
+			if all_keys[pygame.K_d]:
 				acc[0] += speed_accel / fps
-			if all_keys[pygame.K_UP]:
+			if all_keys[pygame.K_w]:
 				acc[2] -= speed_accel / fps
-			if all_keys[pygame.K_DOWN]:
+			if all_keys[pygame.K_s]:
 				acc[2] += speed_accel / fps
 
 			if np.dot(acc, acc) == 0.0:
