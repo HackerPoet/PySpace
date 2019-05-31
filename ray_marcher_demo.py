@@ -264,6 +264,10 @@ if __name__ == '__main__':
 	glUniform2fv(resID, 1, win_size)
 	glUniform1f(ipdID, 0.04)
 
+	fullscreen_quad = np.array([-1.0, -1.0, 0.0, 1.0, -1.0, 0.0, -1.0, 1.0, 0.0, 1.0, 1.0, 0.0], dtype=np.float32)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, fullscreen_quad)
+	glEnableVertexAttribArray(0)
+
 	mat = np.identity(4, np.float32)
 	mat[3,:3] = np.array(start_pos)
 	prevMat = np.copy(mat)

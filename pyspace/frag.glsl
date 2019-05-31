@@ -1,4 +1,4 @@
-#version 400
+#version 120
 #define M_PI 3.14159265358979
 
 uniform mat4 iMat;
