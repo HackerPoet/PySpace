@@ -106,6 +106,7 @@ class Shader:
 			fragment_shader = self.compile_shader(fragment_source, GL_FRAGMENT_SHADER)
 			glAttachShader(program, fragment_shader)
 
+		glBindAttribLocation(program, 0, "vPosition")
 		glLinkProgram(program)
 
 		if vertex_shader:
