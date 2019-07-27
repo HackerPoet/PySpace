@@ -208,6 +208,11 @@ def reorthogonalize(mat):
 	u, s, v = np.linalg.svd(mat)
 	return np.dot(u, v)
 
+# move the cursor back , only if the window is focused
+def center_mouse():
+	if pygame.key.get_focused():
+		pygame.mouse.set_pos(screen_center)
+
 #--------------------------------------------------
 #                  Video Recording
 #
@@ -234,12 +239,12 @@ if __name__ == '__main__':
 	pygame.init()
 	window = pygame.display.set_mode(win_size, OPENGL | DOUBLEBUF)
 	pygame.mouse.set_visible(False)
-	pygame.mouse.set_pos(screen_center)
+	center_mouse()
 
 	#======================================================
 	#               Change the fractal here
 	#======================================================
-	obj_render = tree_planet()
+	obj_render = mandelbox()
 	#======================================================
 
 	#======================================================
@@ -352,25 +357,26 @@ if __name__ == '__main__':
 			mouse_pos = pygame.mouse.get_pos()
 			dx,dy = 0,0
 			if prev_mouse_pos is not None:
-				pygame.mouse.set_pos(screen_center)
+				center_mouse()
 				dx = mouse_pos[0] - screen_center[0]
 				dy = mouse_pos[1] - screen_center[1]
 
-			if gimbal_lock:
-				look_x += dx * look_speed
-				look_y += dy * look_speed
-				look_y = min(max(look_y, -math.pi/2), math.pi/2)
+			if pygame.key.get_focused():
+				if gimbal_lock:
+					look_x += dx * look_speed
+					look_y += dy * look_speed
+					look_y = min(max(look_y, -math.pi/2), math.pi/2)
 
-				rx = make_rot(look_x, 1)
-				ry = make_rot(look_y, 0)
+					rx = make_rot(look_x, 1)
+					ry = make_rot(look_y, 0)
 
-				mat[:3,:3] = np.dot(ry, rx)
-			else:
-				rx = make_rot(dx * look_speed, 1)
-				ry = make_rot(dy * look_speed, 0)
+					mat[:3,:3] = np.dot(ry, rx)
+				else:
+					rx = make_rot(dx * look_speed, 1)
+					ry = make_rot(dy * look_speed, 0)
 
-				mat[:3,:3] = np.dot(ry, np.dot(rx, mat[:3,:3]))
-				mat[:3,:3] = reorthogonalize(mat[:3,:3])
+					mat[:3,:3] = np.dot(ry, np.dot(rx, mat[:3,:3]))
+					mat[:3,:3] = reorthogonalize(mat[:3,:3])
 
 			acc = np.zeros((3,), dtype=np.float32)
 			if all_keys[pygame.K_a]:
