@@ -85,7 +85,7 @@ def infinite_spheres():
 def butterweed_hills():
 	obj = Object()
 	obj.add(OrbitInitZero())
-	for i in range(30):
+	for _ in range(30):
 		obj.add(FoldAbs())
 		obj.add(FoldScaleTranslate(1.5, (-1.0,-0.5,-0.2)))
 		obj.add(OrbitSum((0.5, 0.03, 0.0)))
@@ -97,7 +97,7 @@ def butterweed_hills():
 def mandelbox():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in range(16):
+	for _ in range(16):
 		obj.add(FoldBox(1.0))
 		obj.add(FoldSphere(0.5, 1.0))
 		obj.add(FoldScaleOrigin(2.0))
@@ -108,7 +108,7 @@ def mandelbox():
 def mausoleum():
 	obj = Object()
 	obj.add(OrbitInitZero())
-	for i in range(8):
+	for _ in range(8):
 		obj.add(FoldBox(0.34))
 		obj.add(FoldMenger())
 		obj.add(FoldScaleTranslate(3.28, (-5.27,-0.34,0.0)))
@@ -119,7 +119,7 @@ def mausoleum():
 
 def menger():
 	obj = Object()
-	for i in range(8):
+	for _ in range(8):
 		obj.add(FoldAbs())
 		obj.add(FoldMenger())
 		obj.add(FoldScaleTranslate(3.0, (-2,-2,0)))
@@ -130,7 +130,7 @@ def menger():
 def tree_planet():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in range(30):
+	for _ in range(30):
 		obj.add(FoldRotateY(0.44))
 		obj.add(FoldAbs())
 		obj.add(FoldMenger())
@@ -143,7 +143,7 @@ def tree_planet():
 def sierpinski_tetrahedron():
 	obj = Object()
 	obj.add(OrbitInitZero())
-	for i in range(9):
+	for _ in range(9):
 		obj.add(FoldSierpinski())
 		obj.add(FoldScaleTranslate(2, -1))
 	obj.add(Tetrahedron(color=(0.8,0.8,0.5)))
@@ -152,7 +152,7 @@ def sierpinski_tetrahedron():
 def snow_stadium():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in range(30):
+	for _ in range(30):
 		obj.add(FoldRotateY(3.33))
 		obj.add(FoldSierpinski())
 		obj.add(FoldRotateX(0.15))
@@ -165,7 +165,7 @@ def snow_stadium():
 def test_fractal():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in range(20):
+	for _ in range(20):
 		obj.add(FoldSierpinski())
 		obj.add(FoldMenger())
 		obj.add(FoldRotateY(math.pi/2))
@@ -260,10 +260,10 @@ if __name__ == '__main__':
 	program = shader.compile(camera)
 	print("Compiled!")
 
-	matID = glGetUniformLocation(program, "iMat");
-	prevMatID = glGetUniformLocation(program, "iPrevMat");
-	resID = glGetUniformLocation(program, "iResolution");
-	ipdID = glGetUniformLocation(program, "iIPD");
+	matID = glGetUniformLocation(program, "iMat")
+	prevMatID = glGetUniformLocation(program, "iPrevMat")
+	resID = glGetUniformLocation(program, "iResolution")
+	ipdID = glGetUniformLocation(program, "iIPD")
 
 	glUseProgram(program)
 	glUniform2fv(resID, 1, win_size)
@@ -420,11 +420,11 @@ if __name__ == '__main__':
 		shader.set('pos', mat[3,:3])
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-		glUniformMatrix4fv(matID, 1, False, mat);
-		glUniformMatrix4fv(prevMatID, 1, False, prevMat);
+		glUniformMatrix4fv(matID, 1, False, mat)
+		glUniformMatrix4fv(prevMatID, 1, False, prevMat)
 		prevMat = np.copy(mat)
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 		pygame.display.flip()
 		clock.tick(fps)
 		frame_num += 1
