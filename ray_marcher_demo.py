@@ -22,7 +22,7 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'
 win_size = (1280, 720)
 
 #Maximum frames per second
-fps = 30
+max_fps = 30
 
 #Forces an 'up' orientation when True, free-camera when False
 gimbal_lock = False
@@ -244,7 +244,7 @@ if __name__ == '__main__':
 	#======================================================
 	#               Change the fractal here
 	#======================================================
-	obj_render = mandelbox()
+	obj_render = tree_planet()
 	#======================================================
 
 	#======================================================
@@ -324,7 +324,7 @@ if __name__ == '__main__':
 				elif event.key == pygame.K_ESCAPE:
 					sys.exit(0)
 
-		mat[3,:3] += vel / fps
+		mat[3,:3] += vel * (clock.get_time() / 1000)
 
 		if auto_velocity:
 			de = obj_render.DE(mat[3]) * auto_multiplier
@@ -358,8 +358,9 @@ if __name__ == '__main__':
 			dx,dy = 0,0
 			if prev_mouse_pos is not None:
 				center_mouse()
-				dx = mouse_pos[0] - screen_center[0]
-				dy = mouse_pos[1] - screen_center[1]
+				time_rate = (clock.get_time() / 1000.0) / (1 / max_fps)
+				dx = (mouse_pos[0] - screen_center[0]) * time_rate
+				dy = (mouse_pos[1] - screen_center[1]) * time_rate
 
 			if pygame.key.get_focused():
 				if gimbal_lock:
@@ -380,16 +381,16 @@ if __name__ == '__main__':
 
 			acc = np.zeros((3,), dtype=np.float32)
 			if all_keys[pygame.K_a]:
-				acc[0] -= speed_accel / fps
+				acc[0] -= speed_accel / max_fps
 			if all_keys[pygame.K_d]:
-				acc[0] += speed_accel / fps
+				acc[0] += speed_accel / max_fps
 			if all_keys[pygame.K_w]:
-				acc[2] -= speed_accel / fps
+				acc[2] -= speed_accel / max_fps
 			if all_keys[pygame.K_s]:
-				acc[2] += speed_accel / fps
+				acc[2] += speed_accel / max_fps
 
 			if np.dot(acc, acc) == 0.0:
-				vel *= speed_decel
+				vel *= speed_decel # TODO
 			else:
 				vel += np.dot(mat[:3,:3].T, acc)
 				vel_ratio = min(max_velocity, de) / (np.linalg.norm(vel) + 1e-12)
@@ -426,5 +427,6 @@ if __name__ == '__main__':
 
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 		pygame.display.flip()
-		clock.tick(fps)
+		clock.tick(max_fps)
 		frame_num += 1
+		print(clock.get_fps())
