@@ -232,19 +232,53 @@ def center_mouse():
 # can import the image sequence to editing software
 # to convert it to a video.
 #
-#    You can press 's' anytime for a screenshot.
+#    You can press 'c' anytime for a screenshot.
 #---------------------------------------------------
 
 if __name__ == '__main__':
 	pygame.init()
-	window = pygame.display.set_mode(win_size, OPENGL | DOUBLEBUF)
+	window = pygame.display.set_mode(win_size)
 	pygame.mouse.set_visible(False)
 	center_mouse()
 
 	#======================================================
-	#               Change the fractal here
+	#               Create a menu screen
 	#======================================================
-	obj_render = tree_planet()
+	obj_render = None
+
+	menu = {
+		'1': infinite_spheres,
+		'2': butterweed_hills,
+		'3': mandelbox,
+		'4': mausoleum,
+		'5': menger,
+		'6': tree_planet,
+		'7': sierpinski_tetrahedron,
+		'8': snow_stadium,
+		'9': test_fractal
+	}
+
+	font_size = 60
+	my_font = pygame.font.Font(None, font_size) # None gets default font
+
+	i = 2
+	for k, v in menu.items():
+		text = k + " : " + v.__name__
+		text_surface = my_font.render(text, True, ( 255, 255, 255 ))
+		window.blit(text_surface, ( (win_size[0] - text_surface.get_width()) / 2, i * font_size ))
+		i += 1
+	text_surface = my_font.render('Fractal Menu', True, ( 255, 255, 255 ))
+	window.blit(text_surface, ( (win_size[0] - text_surface.get_width()) / 2, 60 ))
+	pygame.display.flip()
+
+	while True:
+		# sleep until a key is pressed
+		event = pygame.event.wait()
+		if event.type == pygame.QUIT: sys.exit(0)
+		if event.type == pygame.KEYDOWN and event.unicode in '123456789':
+			obj_render = menu[event.unicode]()
+			break
+	window = pygame.display.set_mode(win_size, OPENGL | DOUBLEBUF)
 	#======================================================
 
 	#======================================================
