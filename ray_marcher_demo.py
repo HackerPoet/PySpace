@@ -22,7 +22,7 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'
 win_size = (1280, 720)
 
 #Maximum frames per second
-fps = 30
+max_fps = 30
 
 #Forces an 'up' orientation when True, free-camera when False
 gimbal_lock = False
@@ -85,7 +85,7 @@ def infinite_spheres():
 def butterweed_hills():
 	obj = Object()
 	obj.add(OrbitInitZero())
-	for i in range(30):
+	for _ in range(30):
 		obj.add(FoldAbs())
 		obj.add(FoldScaleTranslate(1.5, (-1.0,-0.5,-0.2)))
 		obj.add(OrbitSum((0.5, 0.03, 0.0)))
@@ -97,7 +97,7 @@ def butterweed_hills():
 def mandelbox():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in range(16):
+	for _ in range(16):
 		obj.add(FoldBox(1.0))
 		obj.add(FoldSphere(0.5, 1.0))
 		obj.add(FoldScaleOrigin(2.0))
@@ -108,7 +108,7 @@ def mandelbox():
 def mausoleum():
 	obj = Object()
 	obj.add(OrbitInitZero())
-	for i in range(8):
+	for _ in range(8):
 		obj.add(FoldBox(0.34))
 		obj.add(FoldMenger())
 		obj.add(FoldScaleTranslate(3.28, (-5.27,-0.34,0.0)))
@@ -119,7 +119,7 @@ def mausoleum():
 
 def menger():
 	obj = Object()
-	for i in range(8):
+	for _ in range(8):
 		obj.add(FoldAbs())
 		obj.add(FoldMenger())
 		obj.add(FoldScaleTranslate(3.0, (-2,-2,0)))
@@ -130,7 +130,7 @@ def menger():
 def tree_planet():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in range(30):
+	for _ in range(30):
 		obj.add(FoldRotateY(0.44))
 		obj.add(FoldAbs())
 		obj.add(FoldMenger())
@@ -143,7 +143,7 @@ def tree_planet():
 def sierpinski_tetrahedron():
 	obj = Object()
 	obj.add(OrbitInitZero())
-	for i in range(9):
+	for _ in range(9):
 		obj.add(FoldSierpinski())
 		obj.add(FoldScaleTranslate(2, -1))
 	obj.add(Tetrahedron(color=(0.8,0.8,0.5)))
@@ -152,7 +152,7 @@ def sierpinski_tetrahedron():
 def snow_stadium():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in range(30):
+	for _ in range(30):
 		obj.add(FoldRotateY(3.33))
 		obj.add(FoldSierpinski())
 		obj.add(FoldRotateX(0.15))
@@ -165,7 +165,7 @@ def snow_stadium():
 def test_fractal():
 	obj = Object()
 	obj.add(OrbitInitInf())
-	for i in range(20):
+	for _ in range(20):
 		obj.add(FoldSierpinski())
 		obj.add(FoldMenger())
 		obj.add(FoldRotateY(math.pi/2))
@@ -208,6 +208,11 @@ def reorthogonalize(mat):
 	u, s, v = np.linalg.svd(mat)
 	return np.dot(u, v)
 
+# move the cursor back , only if the window is focused
+def center_mouse():
+	if pygame.key.get_focused():
+		pygame.mouse.set_pos(screen_center)
+
 #--------------------------------------------------
 #                  Video Recording
 #
@@ -234,7 +239,7 @@ if __name__ == '__main__':
 	pygame.init()
 	window = pygame.display.set_mode(win_size, OPENGL | DOUBLEBUF)
 	pygame.mouse.set_visible(False)
-	pygame.mouse.set_pos(screen_center)
+	center_mouse()
 
 	#======================================================
 	#               Change the fractal here
@@ -255,10 +260,10 @@ if __name__ == '__main__':
 	program = shader.compile(camera)
 	print("Compiled!")
 
-	matID = glGetUniformLocation(program, "iMat");
-	prevMatID = glGetUniformLocation(program, "iPrevMat");
-	resID = glGetUniformLocation(program, "iResolution");
-	ipdID = glGetUniformLocation(program, "iIPD");
+	matID = glGetUniformLocation(program, "iMat")
+	prevMatID = glGetUniformLocation(program, "iPrevMat")
+	resID = glGetUniformLocation(program, "iResolution")
+	ipdID = glGetUniformLocation(program, "iIPD")
 
 	glUseProgram(program)
 	glUniform2fv(resID, 1, win_size)
@@ -319,7 +324,7 @@ if __name__ == '__main__':
 				elif event.key == pygame.K_ESCAPE:
 					sys.exit(0)
 
-		mat[3,:3] += vel / fps
+		mat[3,:3] += vel * (clock.get_time() / 1000)
 
 		if auto_velocity:
 			de = obj_render.DE(mat[3]) * auto_multiplier
@@ -352,38 +357,40 @@ if __name__ == '__main__':
 			mouse_pos = pygame.mouse.get_pos()
 			dx,dy = 0,0
 			if prev_mouse_pos is not None:
-				pygame.mouse.set_pos(screen_center)
-				dx = mouse_pos[0] - screen_center[0]
-				dy = mouse_pos[1] - screen_center[1]
+				center_mouse()
+				time_rate = (clock.get_time() / 1000.0) / (1 / max_fps)
+				dx = (mouse_pos[0] - screen_center[0]) * time_rate
+				dy = (mouse_pos[1] - screen_center[1]) * time_rate
 
-			if gimbal_lock:
-				look_x += dx * look_speed
-				look_y += dy * look_speed
-				look_y = min(max(look_y, -math.pi/2), math.pi/2)
+			if pygame.key.get_focused():
+				if gimbal_lock:
+					look_x += dx * look_speed
+					look_y += dy * look_speed
+					look_y = min(max(look_y, -math.pi/2), math.pi/2)
 
-				rx = make_rot(look_x, 1)
-				ry = make_rot(look_y, 0)
+					rx = make_rot(look_x, 1)
+					ry = make_rot(look_y, 0)
 
-				mat[:3,:3] = np.dot(ry, rx)
-			else:
-				rx = make_rot(dx * look_speed, 1)
-				ry = make_rot(dy * look_speed, 0)
+					mat[:3,:3] = np.dot(ry, rx)
+				else:
+					rx = make_rot(dx * look_speed, 1)
+					ry = make_rot(dy * look_speed, 0)
 
-				mat[:3,:3] = np.dot(ry, np.dot(rx, mat[:3,:3]))
-				mat[:3,:3] = reorthogonalize(mat[:3,:3])
+					mat[:3,:3] = np.dot(ry, np.dot(rx, mat[:3,:3]))
+					mat[:3,:3] = reorthogonalize(mat[:3,:3])
 
 			acc = np.zeros((3,), dtype=np.float32)
 			if all_keys[pygame.K_a]:
-				acc[0] -= speed_accel / fps
+				acc[0] -= speed_accel / max_fps
 			if all_keys[pygame.K_d]:
-				acc[0] += speed_accel / fps
+				acc[0] += speed_accel / max_fps
 			if all_keys[pygame.K_w]:
-				acc[2] -= speed_accel / fps
+				acc[2] -= speed_accel / max_fps
 			if all_keys[pygame.K_s]:
-				acc[2] += speed_accel / fps
+				acc[2] += speed_accel / max_fps
 
 			if np.dot(acc, acc) == 0.0:
-				vel *= speed_decel
+				vel *= speed_decel # TODO
 			else:
 				vel += np.dot(mat[:3,:3].T, acc)
 				vel_ratio = min(max_velocity, de) / (np.linalg.norm(vel) + 1e-12)
@@ -414,11 +421,12 @@ if __name__ == '__main__':
 		shader.set('pos', mat[3,:3])
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-		glUniformMatrix4fv(matID, 1, False, mat);
-		glUniformMatrix4fv(prevMatID, 1, False, prevMat);
+		glUniformMatrix4fv(matID, 1, False, mat)
+		glUniformMatrix4fv(prevMatID, 1, False, prevMat)
 		prevMat = np.copy(mat)
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 		pygame.display.flip()
-		clock.tick(fps)
+		clock.tick(max_fps)
 		frame_num += 1
+		print(clock.get_fps())
