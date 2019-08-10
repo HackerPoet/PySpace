@@ -75,11 +75,6 @@ class Camera:
 		# NOTE: This must be a normalized quantity (magnitude = 1.0)
 		self.params['LIGHT_DIRECTION'] = (-0.36, 0.48, 0.80)
 
-		# Number of additional renderings between frames.
-		# NOTE: This will slow down rendering linearly.
-		# Recommended Range: 0 to 10 (integer)
-		self.params['MOTION_BLUR_LEVEL'] = 0
-
 		# Maximum number of marches before a ray is considered a non-intersection.
 		# Recommended Range: 10 to 10000 (integer)
 		self.params['MAX_MARCHES'] = 1000
@@ -91,6 +86,11 @@ class Camera:
 		# Minimum march distance until a ray is considered intersecting.
 		# Recommended Range: 0.000001 to 0.01
 		self.params['MIN_DIST'] = 0.00001
+
+		# Number of additional renderings between frames.
+		# NOTE: This will slow down rendering linearly.
+		# Recommended Range: 0 to 10 (integer)
+		self.params['MOTION_BLUR_LEVEL'] = 0
 
 		# If true will render an omnidirectional stereo 360 projection.
 		self.params['ODS'] = False
