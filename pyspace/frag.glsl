@@ -155,7 +155,8 @@ vec4 scene(inout vec4 origin, inout vec4 ray, float vignette) {
 
 	//Determine the color for this pixel
 	vec3 col = vec3(0.0);
-	if (d < MIN_DIST) {
+	float min_dist = MIN_DIST * max(td * 10.0, 1.0);
+	if (d < min_dist) {
 		//Get the surface normal
 		vec4 e = vec4(MIN_DIST, 0.0, 0.0, 0.0);
 		vec3 n = vec3(DE(p + e.xyyy) - DE(p - e.xyyy),
@@ -171,7 +172,7 @@ vec4 scene(inout vec4 origin, inout vec4 ray, float vignette) {
 		float k = 1.0;
 		#if SHADOWS_ENABLED
 			vec4 light_pt = p;
-			light_pt.xyz += n * MIN_DIST * 10;
+			light_pt.xyz += n * min_dist * 10;
 			vec4 rm = ray_march(light_pt, LIGHT_DIRECTION, SHADOW_SHARPNESS);
 			k = rm.w * min(rm.z, 1.0);
 		#endif
@@ -205,7 +206,7 @@ vec4 scene(inout vec4 origin, inout vec4 ray, float vignette) {
 		#endif
 
 		//Set up the reflection
-		origin = p + vec4(n * MIN_DIST * 100, 0.0);
+		origin = p + vec4(n * min_dist * 100, 0.0);
 		ray = vec4(reflected, 0.0);
 
 		//Apply vignette if needed
