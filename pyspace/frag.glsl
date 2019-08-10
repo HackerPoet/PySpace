@@ -144,6 +144,16 @@ vec4 ray_march(inout vec4 p, vec3 ray, float sharpness) {
 	return ray_march(p, vec4(ray, 0.0), sharpness);
 }
 
+//A faster formula to find the gradient/normal direction of the DE(the w component is the average DE)
+//credit to http://www.iquilezles.org/www/articles/normalsSDF/normalsSDF.htm
+vec3 calcNormal(vec4 p, float dx) {
+	const vec3 k = vec3(1,-1,0);
+	return normalize(k.xyy*DE(p + k.xyyz*dx) +
+					 k.yyx*DE(p + k.yyxz*dx) +
+					 k.yxy*DE(p + k.yxyz*dx) +
+					 k.xxx*DE(p + k.xxxz*dx));
+}
+
 vec4 scene(inout vec4 origin, inout vec4 ray, float vignette) {
 	//Trace the ray
 	vec4 p = origin;
@@ -158,11 +168,7 @@ vec4 scene(inout vec4 origin, inout vec4 ray, float vignette) {
 	float min_dist = MIN_DIST * max(td * 10.0, 1.0);
 	if (d < min_dist) {
 		//Get the surface normal
-		vec4 e = vec4(MIN_DIST, 0.0, 0.0, 0.0);
-		vec3 n = vec3(DE(p + e.xyyy) - DE(p - e.xyyy),
-					  DE(p + e.yxyy) - DE(p - e.yxyy),
-					  DE(p + e.yyxy) - DE(p - e.yyxy));
-		n /= (length(n));
+		vec3 n = calcNormal(p, MIN_DIST * 10);
 		vec3 reflected = ray.xyz - 2.0*dot(ray.xyz, n) * n;
 
 		//Get coloring
