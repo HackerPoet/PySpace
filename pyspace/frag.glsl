@@ -120,11 +120,10 @@ float de_inf_line(vec4 p, vec3 n, float r) {
 //   Main code
 //
 //##########################################
-vec4 ray_march(inout vec4 p, vec4 ray, float sharpness) {
+vec4 ray_march(inout vec4 p, vec4 ray, float sharpness, float td) {
 	//March the ray
 	float d = MIN_DIST;
 	float s = 0.0;
-	float td = 0.0;
 	float min_d = 1.0;
 	for (; s < MAX_MARCHES; s += 1.0) {
 		d = DE(p);
@@ -140,8 +139,8 @@ vec4 ray_march(inout vec4 p, vec4 ray, float sharpness) {
 	}
 	return vec4(d, s, td, min_d);
 }
-vec4 ray_march(inout vec4 p, vec3 ray, float sharpness) {
-	return ray_march(p, vec4(ray, 0.0), sharpness);
+vec4 ray_march(inout vec4 p, vec3 ray, float sharpness, float td) {
+	return ray_march(p, vec4(ray, 0.0), sharpness, td);
 }
 
 //A faster formula to find the gradient/normal direction of the DE(the w component is the average DE)
@@ -154,13 +153,13 @@ vec3 calcNormal(vec4 p, float dx) {
 					 k.xxx*DE(p + k.xxxz*dx));
 }
 
-vec4 scene(inout vec4 origin, inout vec4 ray, float vignette) {
+vec4 scene(inout vec4 origin, inout vec4 ray, float vignette, float td) {
 	//Trace the ray
 	vec4 p = origin;
-	vec4 d_s_td_m = ray_march(p, ray, GLOW_SHARPNESS);
+	vec4 d_s_td_m = ray_march(p, ray, GLOW_SHARPNESS, td);
 	float d = d_s_td_m.x;
 	float s = d_s_td_m.y;
-	float td = d_s_td_m.z;
+	td = d_s_td_m.z;
 	float m = d_s_td_m.w;
 
 	//Determine the color for this pixel
@@ -179,7 +178,7 @@ vec4 scene(inout vec4 origin, inout vec4 ray, float vignette) {
 		#if SHADOWS_ENABLED
 			vec4 light_pt = p;
 			light_pt.xyz += n * min_dist * 10;
-			vec4 rm = ray_march(light_pt, LIGHT_DIRECTION, SHADOW_SHARPNESS);
+			vec4 rm = ray_march(light_pt, LIGHT_DIRECTION, SHADOW_SHARPNESS, 0.0);
 			k = rm.w * min(rm.z, 1.0);
 		#endif
 
@@ -302,14 +301,14 @@ void main() {
 					float ref_alpha = 1.0;
 					for (int r = 0; r < REFLECTION_LEVEL + 1; ++r) {
 						ref_alpha *= REFLECTION_ATTENUATION;
-						newCol += ref_alpha * scene(p, ray, vignette);
+						newCol += ref_alpha * scene(p, ray, vignette, 0.0);
 						if (ray == prevRay || r >= REFLECTION_LEVEL) {
 							break;
 						}
 					}
 					col += newCol;
 				#else
-					col += scene(p, ray, vignette);
+					col += scene(p, ray, vignette, 0.0);
 				#endif
 
 			}
