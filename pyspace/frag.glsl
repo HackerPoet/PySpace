@@ -245,7 +245,7 @@ void main() {
 			for (int j = 0; j < ANTIALIASING_SAMPLES; ++j) {
 				mat4 mat = iMat;
 				#if MOTION_BLUR_LEVEL > 0
-					float a = float(k) / (MOTION_BLUR_LEVEL + 1);
+					float a = MOTION_BLUR_RATIO * float(k) / (MOTION_BLUR_LEVEL + 1);
 					mat = iPrevMat*a + iMat*(1.0 - a);
 				#endif
 

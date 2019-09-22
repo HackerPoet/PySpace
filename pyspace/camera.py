@@ -92,6 +92,11 @@ class Camera:
 		# Recommended Range: 0 to 10 (integer)
 		self.params['MOTION_BLUR_LEVEL'] = 0
 
+		# Proportion of time the shutter is open during a frame
+		# NOTE: Only applys when MOTION_BLUR_LEVEL is greater than 0
+		# Recommended Range: 0.0 to 1.0
+		self.params['MOTION_BLUR_RATIO'] = 1.0
+
 		# If true will render an omnidirectional stereo 360 projection.
 		self.params['ODS'] = False
 
