@@ -26,8 +26,6 @@ class Sphere:
 
 class Box:
 	def __init__(self, s=(1,1,1), c=(0,0,0), color=(1,1,1)):
-		if type(s) is float:
-			s = (s,s,s)
 		self.s = set_global_vec3(s)
 		self.c = set_global_vec3(c)
 		self.color = color
