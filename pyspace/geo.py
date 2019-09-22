@@ -219,7 +219,7 @@ class XHalfSpace:
 
 	def DE(self, p):
 		x = get_global(self.x)
-		return abs(p[0] - x) / p[3]
+		return (p[0] - x) / p[3]
 
 	def NP(self, p):
 		x = get_global(self.x)
@@ -238,7 +238,7 @@ class YHalfSpace:
 
 	def DE(self, p):
 		x = get_global(self.x)
-		return abs(p[1] - x) / p[3]
+		return (p[1] - x) / p[3]
 
 	def NP(self, p):
 		x = get_global(self.x)
@@ -257,7 +257,7 @@ class ZHalfSpace:
 
 	def DE(self, p):
 		x = get_global(self.x)
-		return abs(p[2] - x) / p[3]
+		return (p[2] - x) / p[3]
 
 	def NP(self, p):
 		x = get_global(self.x)
