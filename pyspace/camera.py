@@ -75,6 +75,11 @@ class Camera:
 		# NOTE: This must be a normalized quantity (magnitude = 1.0)
 		self.params['LIGHT_DIRECTION'] = (-0.36, 0.48, 0.80)
 
+		# Level of detail multiplier to improve speed and performance.
+		# When this value is large, distant objects become less detailed.
+		# Recommended Range: 0.0 to 100.0
+		self.params['LOD_MULTIPLIER'] = 10.0
+
 		# Maximum number of marches before a ray is considered a non-intersection.
 		# Recommended Range: 10 to 10000 (integer)
 		self.params['MAX_MARCHES'] = 1000

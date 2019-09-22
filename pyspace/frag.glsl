@@ -164,7 +164,7 @@ vec4 scene(inout vec4 origin, inout vec4 ray, float vignette, float td) {
 
 	//Determine the color for this pixel
 	vec3 col = vec3(0.0);
-	float min_dist = MIN_DIST * max(td * 10.0, 1.0);
+	float min_dist = MIN_DIST * max(td * LOD_MULTIPLIER, 1.0);
 	if (d < min_dist) {
 		//Get the surface normal
 		vec3 n = calcNormal(p, MIN_DIST * 10);
