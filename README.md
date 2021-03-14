@@ -1,6 +1,13 @@
 # PySpace
 GLSL Fractal Ray Marcher in Python
 
+## Requirements
+```
+PyOpenGL >= 3.1.0
+Pygame   >= 1.9.4
+numpy    >= 1.16.1
+```
+
 ## Installation
 
 ```bash
